@@ -1,0 +1,305 @@
+.library-page {
+  background: #fff;
+}
+
+/* the word list can be longer than the screen, so content scrolls under the fixed nav */
+.library-page__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.library-page__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.library-page__inner {
+  position: relative;
+  padding: 166px 20px 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  color: #000;
+}
+
+.library-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.library-section__title {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 18px;
+  letter-spacing: -0.54px;
+  white-space: nowrap;
+}
+
+.library-section__title span {
+  margin-left: 4px;
+  font-weight: 400;
+  font-size: 14px;
+  color: #4c4c4c;
+}
+
+/* ---------- learning entry cards ---------- */
+.library-study {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.library-study__tile {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 4px 0;
+  border: none;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  font-family: inherit;
+  text-align: center;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* only the number sits inside the circle, styled like the not-yet-selected purpose circles in
+   onboarding (white fill, 2px #e0e0e0 ring, black bold text); its name goes underneath */
+.library-study__circle {
+  width: 76px;
+  height: 76px;
+  border: 2px solid #e0e0e0;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.library-study__count {
+  font-weight: 700;
+  font-size: 30px;
+  line-height: normal;
+  letter-spacing: -0.9px;
+  color: #000;
+}
+
+.library-study__label {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: -0.42px;
+  color: #000;
+}
+
+/* ---------- filters ---------- */
+.library-filters {
+  display: flex;
+  gap: 6px;
+  padding: 4px;
+  border: 1px solid #e0e0e0;
+  border-radius: 50px;
+}
+
+.library-filters__tab {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 1;
+  height: 36px;
+  border: none;
+  border-radius: 50px;
+  background: none;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 14px;
+  color: #4c4c4c;
+  cursor: pointer;
+}
+
+.library-filters__tab--active {
+  background: #4c4c4c;
+  color: #fff;
+}
+
+.library-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.library-chip {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid #e0e0e0;
+  border-radius: 50px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 18px;
+  color: #4c4c4c;
+  cursor: pointer;
+}
+
+.library-chip span {
+  margin-left: 2px;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.library-chip--active {
+  border-color: #4c4c4c;
+  background: #4c4c4c;
+  color: #fff;
+}
+
+/* ---------- word list ---------- */
+.library-word {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  padding: 16px 20px;
+  border: 1px solid #939393;
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.library-word__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.library-word__spelling {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: normal;
+}
+
+.library-word__meaning {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: normal;
+  text-align: right;
+}
+
+.library-word__phonetic {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.36px;
+}
+
+.library-word__tags {
+  margin-top: 6px;
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  color: #4c4c4c;
+}
+
+.library-empty {
+  padding: 28px 0;
+  text-align: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #4c4c4c;
+}
+
+.library-add {
+  appearance: none;
+  -webkit-appearance: none;
+  align-self: center;
+  height: 45px;
+  padding: 0 32px;
+  border: none;
+  border-radius: 50px;
+  background: #4c4c4c;
+  font-family: inherit;
+  font-size: 18px;
+  color: #fff;
+  cursor: pointer;
+}
+
+/* ---------- status message ---------- */
+.library-page__notice {
+  position: absolute;
+  left: 50%;
+  bottom: 129px;
+  transform: translateX(-50%);
+  z-index: 5;
+  max-width: 370px;
+  padding: 12px 20px;
+  border-radius: 50px;
+  background: #4c4c4c;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* ---------- 단어 목록 header: title on the left, filter icon on the right ---------- */
+.library-section__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.library-sliders {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  width: 36px;
+  height: 36px;
+  margin-right: -6px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.library-sliders--open {
+  background: #e0e0e0;
+}
+
+.library-sliders img {
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+
+.library-sliders__dot {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4c4c4c;
+  border: 1.5px solid #fff;
+}
+
+.library-filter-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

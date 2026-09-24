@@ -1,0 +1,52 @@
+.bottom-nav {
+  position: absolute;
+  left: 50%;
+  top: 815px;
+  transform: translateX(-50%);
+  width: 390px;
+  height: 70px;
+  border-radius: 50px;
+  background: #4c4c4c;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.bottom-nav__item {
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: none;
+  cursor: pointer;
+  width: 58px;
+  height: 58px;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.bottom-nav__item--active {
+  width: auto;
+  background: #fff;
+  gap: 10px;
+  padding: 16px;
+}
+
+/* the active icons are exported with a 1px stroke bleed around a 26px layout box */
+.bottom-nav__item--active img {
+  margin: -1px;
+}
+
+.bottom-nav__item--active span {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 24px;
+  line-height: normal;
+  letter-spacing: -1.68px;
+  color: #000;
+  white-space: nowrap;
+}

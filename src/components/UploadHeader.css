@@ -1,0 +1,52 @@
+
+.upload-header {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 430px;
+  height: 142px;
+  border-radius: 0 0 24px 24px;
+  background: #d9d9d9;
+  overflow: hidden;
+}
+
+.upload-header__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.upload-header__text {
+  position: absolute;
+  left: 50%;
+  top: 52px;
+  transform: translateX(-50%);
+  width: 252px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  line-height: normal;
+  white-space: nowrap;
+}
+
+.upload-header__title {
+  font-weight: 700;
+  font-size: 24px;
+  color: #fff;
+}
+
+.upload-header__subtitle {
+  font-weight: 400;
+  font-size: 18px;
+  color: #000;
+}
+
+
+/* the box hugs its text, so the visible text block (not a fixed 252px box) sits on the screen's centre line;
+   the text inside stays left-aligned */
+.upload-header__text--fit {
+  width: max-content;
+}

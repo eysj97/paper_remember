@@ -1,0 +1,40 @@
+.onboarding2__content {
+  position: absolute;
+  left: 50%;
+  top: calc(50% - 20px);
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 120px;
+  width: 352px;
+}
+
+.onboarding2__hero {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.onboarding2__text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 18px;
+  color: #000;
+}
+
+.onboarding2__title {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 600;
+  font-size: 28px;
+  line-height: normal;
+}
+
+.onboarding2__body {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: normal;
+  width: 334px;
+}

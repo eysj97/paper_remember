@@ -1,0 +1,227 @@
+.result-page {
+  background: #fff;
+}
+
+/* the results can be longer than the screen, so content scrolls under the fixed nav */
+.result-page__scroll {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+
+.result-page__scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.result-page__inner {
+  position: relative;
+  padding-top: 142px;
+  padding-bottom: 140px;
+}
+
+/* sections start below the 142px header so its rounded lower corners show, like the other pages */
+.result-page__contents {
+  position: relative;
+  width: 432px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 9px;
+}
+
+.result-section {
+  width: 430px;
+  padding: 34px 25px 30px 18px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 19px;
+  color: #000;
+}
+
+.result-section__intro {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.result-section__title {
+  font-weight: 700;
+  font-size: 18px;
+  line-height: 18px;
+  letter-spacing: -0.54px;
+  white-space: nowrap;
+}
+
+.result-section__hint {
+  height: 25px;
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: -0.42px;
+  white-space: nowrap;
+}
+
+/* ---------- tags ---------- */
+.result-tags {
+  width: 377px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.result-tag {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 50px;
+  padding: 13px 22px 13px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 50px;
+  background: #fff;
+  font-family: inherit;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 18px;
+  letter-spacing: -0.48px;
+  color: #4c4c4c;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.result-tag--selected {
+  border-color: #4c4c4c;
+  background: #4c4c4c;
+  color: #fff;
+}
+
+.result-tag--add {
+  width: 50px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-tag--input {
+  width: 110px;
+  outline: none;
+  cursor: text;
+}
+
+.result-tag--input:focus {
+  border-color: #4c4c4c;
+}
+
+/* ---------- result cards ---------- */
+.result-card {
+  width: 100%;
+  padding: 18px 20px;
+  border: 1px solid #939393;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.result-card__head {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.result-card__word {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: 0;
+  border: none;
+  background: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  font-family: inherit;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.result-card__word:disabled {
+  cursor: default;
+}
+
+.result-card__spelling {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: normal;
+}
+
+.result-card__phonetic {
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 18px;
+  letter-spacing: -0.36px;
+}
+
+.result-card__meaning {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: normal;
+  text-align: right;
+}
+
+.result-card__example {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.result-card__example strong {
+  font-weight: 700;
+}
+
+/* not in the Figma card, added so the synonyms the dictionary returns are visible */
+.result-card__synonyms {
+  margin-top: -6px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.result-card__synonyms span {
+  font-weight: 600;
+}
+
+/* spelling suggestions for a word the dictionary does not know (not in the Figma card) */
+.result-card__suggest {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  margin-top: -6px;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: normal;
+}
+
+.result-card__suggest button {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 28px;
+  padding: 0 12px;
+  border: 1px solid #4c4c4c;
+  border-radius: 50px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  color: #4c4c4c;
+  cursor: pointer;
+}
+
+.result-card__suggest button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
