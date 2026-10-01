@@ -15,7 +15,7 @@ import LoginPage, { LoadingPage } from './pages/LoginPage.jsx'
 import { applyAnswer } from './services/study.js'
 import { dateToTime, goalTitle } from './services/goal.js'
 import { loadWordbook, removeWord, saveWordbook, upsertWords } from './services/wordbook.js'
-import { loadProfile, saveProfile } from './services/profile.js'
+import { defaultProfile, loadProfile, saveProfile } from './services/profile.js'
 import { loadStudyLog, logAnswer, saveStudyLog } from './services/studyLog.js'
 import { clearAllData, STORAGE_KEYS } from './services/backup.js'
 import { loadGuest, saveGuest, serverEnabled, supabase } from './services/supabase.js'
@@ -273,6 +273,8 @@ export default function App() {
   const canNext = ONBOARDING_REQUIREMENTS[pageIndex]?.(profile) ?? true
   const goNext = () => {
     if (!canNext) return
+    // leaving the cover starts onboarding over: answers left from an unfinished earlier try are cleared
+    if (pageIndex === 0 && !profile.onboardedAt) setProfile(defaultProfile())
     if (isLast) finishOnboarding()
     else setPageIndex((i) => i + 1)
   }
