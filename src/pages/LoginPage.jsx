@@ -20,8 +20,9 @@ export function LoadingPage({ text = '불러오는 중이에요…' }) {
   )
 }
 
-// mode 'recover' is opened from the password-reset mail; onRecovered closes it
-export default function LoginPage({ initialMode = 'login', onGuest, onRecovered }) {
+// mode 'recover' is opened from the password-reset mail; onRecovered closes it.
+// onGuest offers "로그인 없이 시작하기"; onCancel goes back (opened from the cover page)
+export default function LoginPage({ initialMode = 'login', onGuest, onCancel, onRecovered }) {
   const [mode, setMode] = useState(initialMode)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -177,6 +178,12 @@ export default function LoginPage({ initialMode = 'login', onGuest, onRecovered 
           )}
         </div>
       </form>
+
+      {mode !== 'recover' && onCancel && (
+        <button type="button" className="login-page__guest" onClick={onCancel}>
+          <span className="login-page__guest-main">처음으로 돌아가기</span>
+        </button>
+      )}
 
       {mode !== 'recover' && onGuest && (
         <button type="button" className="login-page__guest" onClick={onGuest}>

@@ -84,6 +84,8 @@ export default function App() {
   // login (server). Without server keys the app stays local-only and never shows the login screen.
   const auth = useAuth()
   const [guest, setGuest] = useState(loadGuest)
+  // "이미 계정이 있어요" on the cover: log in before onboarding (returning user on a new device)
+  const [loginFirst, setLoginFirst] = useState(false)
   const chooseGuest = (value) => {
     saveGuest(value)
     setGuest(value)
@@ -114,6 +116,7 @@ export default function App() {
     setStudyLog({})
     setPageIndex(0)
     setScreen(null)
+    setLoginFirst(false)
   }
 
   // a backup file was restored (it is already stored; this shows it)
@@ -157,7 +160,13 @@ export default function App() {
 
   if (!auth.ready) return <LoadingPage />
   if (auth.recovering) return <LoginPage initialMode="recover" onRecovered={auth.finishRecovery} />
-  if (serverEnabled && !auth.user && !guest) return <LoginPage onGuest={() => chooseGuest(true)} />
+  // login comes after onboarding: new users see what the app does first, then sign up to keep their words
+  if (serverEnabled && !auth.user && !guest) {
+    if (profile.onboardedAt) {
+      return <LoginPage key="after-onboarding" initialMode="signup" onGuest={() => chooseGuest(true)} />
+    }
+    if (loginFirst) return <LoginPage key="from-cover" onCancel={() => setLoginFirst(false)} />
+  }
   // first sync on a device with nothing on it yet: wait for the account's data instead of starting onboarding
   if (sync.status === 'loading' && !hasData({ wordbook, profile, studyLog })) {
     return <LoadingPage text="단어장을 불러오는 중이에요…" />
@@ -274,6 +283,7 @@ export default function App() {
       onBack={goBack}
       onNext={goNext}
       canNext={canNext}
+      onLogin={serverEnabled && !auth.user ? () => setLoginFirst(true) : undefined}
       studyMode={studyMode}
       onStudyModeChange={setStudyMode}
       goal={profile.goal}
