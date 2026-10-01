@@ -283,4 +283,7 @@ button.upload-card {
   line-height: 1.4;
   text-align: center;
   color: #fff;
+  /* one line, sized to the text: left: 50% alone would squeeze it into half the screen width */
+  width: max-content;
+  white-space: nowrap;
 }

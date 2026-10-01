@@ -141,8 +141,8 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
     setNotice({
       text:
         found === missing.length
-          ? `단어 ${words.length}개의 뜻을 채웠어요. 틀린 뜻은 고쳐 주세요.`
-          : `뜻 ${found}개를 채웠어요. 빈 칸은 단어등록할 때 사전 뜻으로 채워져요.`,
+          ? `뜻을 채웠어요. 틀린 뜻은 고쳐 주세요.`
+          : `뜻 ${found}개를 채웠어요. 빈 칸은 등록할 때 채워요.`,
     })
   }
 
@@ -152,14 +152,14 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
     try {
       const words = await readWordsFromImage(image)
       if (words.length === 0) {
-        setNotice({ text: '단어를 찾지 못했어요. 더 밝고 또렷하게 다시 찍어 주세요.' })
+        setNotice({ text: '단어를 못 찾았어요. 더 밝게 다시 찍어 주세요.' })
       } else {
         const found = words.map((word) => ({ word, meaning: '' }))
         applyWords(found)
         await fillMeanings(found)
       }
     } catch {
-      setNotice({ text: '글자를 읽지 못했어요. 잠시 후 다시 시도해 주세요.' })
+      setNotice({ text: '글자를 읽지 못했어요. 다시 시도해 주세요.' })
     } finally {
       setBusy(false)
     }
@@ -174,7 +174,7 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
     try {
       const words = await readWordFile(file)
       if (words.length === 0) {
-        setNotice({ text: "파일에서 '영단어,뜻' 형식의 줄을 찾지 못했어요." })
+        setNotice({ text: "'영단어,뜻' 형식의 줄을 찾지 못했어요." })
       } else {
         applyWords(words)
         if (words.every((w) => w.meaning.trim())) {

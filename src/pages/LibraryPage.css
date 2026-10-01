@@ -251,6 +251,7 @@
   line-height: 1.4;
   text-align: center;
   color: #fff;
+  width: max-content;
   white-space: nowrap;
 }
 
