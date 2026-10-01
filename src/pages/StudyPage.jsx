@@ -210,6 +210,45 @@ function Matching({ question, pairs, picked, onPick, onPair, onUnpair, done }) {
   )
 }
 
+// 단어 카드: the word on the front, everything about it on the back; tapping flips it
+function Flashcard({ item, flipped, onFlip }) {
+  return (
+    <button
+      type="button"
+      className={`study-flashcard${flipped ? ' study-flashcard--flipped' : ''}`}
+      aria-label={flipped ? `${item.word} 카드 앞면 보기` : `${item.word} 카드 뒷면 보기`}
+      onClick={onFlip}
+    >
+      <span className="study-flashcard__inner">
+        <span className="study-flashcard__face" aria-hidden={flipped}>
+          <span className="study-prompt__word">{item.word}</span>
+          <span className="study-prompt__pron">
+            {item.phonetic && <span>{item.phonetic}</span>}
+            {/* listening to the word must not flip the card */}
+            <span onClick={(e) => e.stopPropagation()}>
+              <SpeakButton word={item.word} />
+            </span>
+          </span>
+        </span>
+        <span className="study-flashcard__face study-flashcard__face--back" aria-hidden={!flipped}>
+          <span className="study-flashcard__meaning">{item.meaning}</span>
+          {item.example && (
+            <span className="study-flashcard__example">
+              <Example sentence={item.example} word={item.word} />
+              {item.exampleKo && <span className="study-flashcard__example-ko">{item.exampleKo}</span>}
+            </span>
+          )}
+          {item.synonyms?.length > 0 && (
+            <span className="study-flashcard__synonyms">
+              <strong>유의어</strong> {item.synonyms.join(', ')}
+            </span>
+          )}
+        </span>
+      </span>
+    </button>
+  )
+}
+
 function Feedback({ question, correct, answer }) {
   const { item, type } = question
   const empty = answer === null || answer === '' || (type === 'matching' && Object.keys(answer ?? {}).length === 0)
@@ -300,7 +339,10 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
   // the "wrong words again" round is practice only, so it does not change the review schedule
   const [record, setRecord] = useState(true)
   const [index, setIndex] = useState(0)
-  const [phase, setPhase] = useState('answer') // 'answer' | 'feedback' | 'done'
+  // new words are looked over as flashcards first; reviews and wrong answers go straight to the quiz
+  const [phase, setPhase] = useState(kind === 'new' ? 'cards' : 'answer') // 'cards' | 'answer' | 'feedback' | 'done'
+  const [cardIndex, setCardIndex] = useState(0)
+  const [flipped, setFlipped] = useState(false)
   const [answer, setAnswer] = useState(null)
   const [correct, setCorrect] = useState(false)
   const [results, setResults] = useState([])
@@ -363,7 +405,7 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
         <p className="study-top__title">{TITLES[kind]}</p>
         {total > 0 && phase !== 'done' && (
           <p className="study-top__count">
-            {Math.min(index + 1, total)} / {total}
+            {phase === 'cards' ? cardIndex + 1 : Math.min(index + 1, total)} / {total}
           </p>
         )}
       </div>
@@ -398,6 +440,37 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
       <div className="page study-page" data-name="학습 결과">
         {header}
         <Result results={results} onExit={onExit} onRetry={retry} />
+      </div>
+    )
+  }
+
+  if (phase === 'cards') {
+    const goToCard = (i) => {
+      setCardIndex(i)
+      setFlipped(false)
+    }
+    const last = cardIndex + 1 >= total
+    return (
+      <div className="page study-page" data-name="단어 카드">
+        {header}
+        <div className="study-body">
+          <span className="study-type">단어 카드</span>
+          <Flashcard item={questions[cardIndex].item} flipped={flipped} onFlip={() => setFlipped((f) => !f)} />
+          <p className="study-prompt__hint study-flashcard__hint">카드를 누르면 뒤집혀요</p>
+        </div>
+        <div className="study-footer study-footer--row">
+          <button
+            type="button"
+            className="study-button study-button--ghost"
+            disabled={cardIndex === 0}
+            onClick={() => goToCard(cardIndex - 1)}
+          >
+            이전
+          </button>
+          <button type="button" className="study-button" onClick={() => (last ? setPhase('answer') : goToCard(cardIndex + 1))}>
+            {last ? '퀴즈 풀기' : '다음'}
+          </button>
+        </div>
       </div>
     )
   }
