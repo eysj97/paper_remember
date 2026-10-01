@@ -65,8 +65,8 @@ const formatDate = ({ year, month, day }) => `${String(year).slice(2)}/${pad2(mo
 // the four mypage menus, in the order of the design frames
 const MENUS = [
   { id: 'goal', title: '학습목표 설정', subtitle: '목적 · 목표 · 세부목표를 정해요' },
-  { id: 'account', title: '계정/기타 설정', subtitle: '계정 · 프로필 · 알림 · 데이터를 관리해요' },
-  { id: 'trend', title: '학습추이', subtitle: '지금까지의 학습을 돌아봐요' },
+  { id: 'account', title: '설정', subtitle: '계정 · 프로필 · 알림 · 데이터를 관리해요' },
+  { id: 'trend', title: '학습 현황', subtitle: '지금까지의 학습을 돌아봐요' },
   { id: 'mode', title: '학습목적 변경', subtitle: '시험대비와 회화 중에 골라요' },
 ]
 
@@ -186,7 +186,7 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
   )
 }
 
-// ---------- 계정/기타 설정: profile + reminder + saved data ----------
+// ---------- 설정: account, profile + reminder + saved data ----------
 const SYNC_LABELS = {
   loading: '불러오는 중',
   syncing: '저장 중',
@@ -403,7 +403,7 @@ function AccountSection({ words, profile, studyLog, account, onProfileChange, on
   )
 }
 
-// ---------- 학습추이: totals + this week ----------
+// ---------- 학습 현황: this week, then totals ----------
 function TrendSection({ words, studyLog, studyMode }) {
   const streak = streakDays(studyLog)
   const { answered, accuracy } = totals(studyLog)
@@ -420,18 +420,6 @@ function TrendSection({ words, studyLog, studyMode }) {
 
   return (
     <>
-      <section className="mypage-section">
-        <h2 className="mypage-section__title">한눈에 보기</h2>
-        <div className="mypage-stats">
-          {stats.map((s) => (
-            <div key={s.label} className="mypage-stat">
-              <span className="mypage-stat__value">{s.value}</span>
-              <span className="mypage-stat__label">{s.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       {/* 주간학습현황 (Figma 80:30): Mon–Sun, days with at least one answer get the kraft fill */}
       <section className="mypage-section">
         <h2 className="mypage-week__title">주간학습현황</h2>
@@ -449,6 +437,18 @@ function TrendSection({ words, studyLog, studyMode }) {
               </span>
             )
           })}
+        </div>
+      </section>
+
+      <section className="mypage-section">
+        <h2 className="mypage-section__title">한눈에 보기</h2>
+        <div className="mypage-stats">
+          {stats.map((s) => (
+            <div key={s.label} className="mypage-stat">
+              <span className="mypage-stat__value">{s.value}</span>
+              <span className="mypage-stat__label">{s.label}</span>
+            </div>
+          ))}
         </div>
       </section>
     </>
