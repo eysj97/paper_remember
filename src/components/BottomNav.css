@@ -1,13 +1,14 @@
+/* 60px bar; its bottom edge stays where the 70px bar's was (47px above the screen bottom) */
 .bottom-nav {
   position: absolute;
   left: 50%;
-  top: 815px;
+  top: 825px;
   transform: translateX(-50%);
   width: 390px;
-  height: 70px;
+  height: 60px;
   border-radius: 50px;
   background: #4c4c4c;
-  padding: 0 6px;
+  padding: 0 5px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -19,8 +20,8 @@
   border: none;
   background: none;
   cursor: pointer;
-  width: 58px;
-  height: 58px;
+  width: 50px;
+  height: 50px;
   border-radius: 50px;
   display: flex;
   align-items: center;
@@ -29,11 +30,22 @@
   overflow: hidden;
 }
 
+/* icons are drawn ~28px tall; scaled down to fit the slimmer bar */
+.bottom-nav__item img {
+  height: 24px;
+  width: auto;
+}
+
+/* upload-white.svg carries its own 58px button box around the glyph */
+.bottom-nav__item img.bottom-nav__icon--boxed {
+  height: 50px;
+}
+
 .bottom-nav__item--active {
   width: auto;
   background: #fff;
-  gap: 10px;
-  padding: 16px;
+  gap: 8px;
+  padding: 0 16px;
 }
 
 /* the active icons are exported with a 1px stroke bleed around a 26px layout box */
@@ -44,9 +56,9 @@
 .bottom-nav__item--active span {
   font-family: 'Pretendard', sans-serif;
   font-weight: 400;
-  font-size: 24px;
+  font-size: 20px;
   line-height: normal;
-  letter-spacing: -1.68px;
+  letter-spacing: -1.4px;
   color: #000;
   white-space: nowrap;
 }

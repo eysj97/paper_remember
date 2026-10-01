@@ -10,7 +10,8 @@ import './BottomNav.css'
 
 const ITEMS = [
   { id: 'home', label: '홈', text: 'home', icon: homeWhite, activeIcon: homeBlack },
-  { id: 'upload', label: '업로드', text: 'upload', icon: uploadWhite, activeIcon: uploadBlack },
+  // upload-white.svg is exported with its 58px button box around the glyph, so it's sized as a whole box
+  { id: 'upload', label: '업로드', text: 'upload', icon: uploadWhite, activeIcon: uploadBlack, boxedIcon: true },
   { id: 'book', label: '라이브러리', text: 'library', icon: bookIcon, activeIcon: bookBlack },
   { id: 'user', label: '마이페이지', text: 'my', icon: userIcon, activeIcon: userBlack },
 ]
@@ -29,7 +30,11 @@ export default function BottomNav({ active, onNavigate }) {
             aria-current={isActive ? 'page' : undefined}
             onClick={() => onNavigate?.(item.id)}
           >
-            <img src={isActive ? item.activeIcon : item.icon} alt="" />
+            <img
+              className={!isActive && item.boxedIcon ? 'bottom-nav__icon--boxed' : undefined}
+              src={isActive ? item.activeIcon : item.icon}
+              alt=""
+            />
             {isActive && <span>{item.text}</span>}
           </button>
         )
