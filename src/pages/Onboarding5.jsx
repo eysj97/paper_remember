@@ -74,7 +74,7 @@ export default function Onboarding5({ onBack, onNext, canNext = true, profile, o
               </button>
             )}
           </div>
-          <p className="onboarding5__hint">* 닉네임을 입력하면 시작할 수 있어요 (10글자까지)</p>
+          <p className="onboarding5__hint">* 닉네임은 10글자를 넘어가면 안되요</p>
         </div>
       </div>
 
