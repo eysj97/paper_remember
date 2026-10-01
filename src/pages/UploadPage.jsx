@@ -7,7 +7,7 @@ import fileUploadIcon from '../assets/upload/file-upload.svg'
 import pencilIcon from '../assets/upload/pencil.svg'
 import moreIcon from '../assets/upload/icon-more.svg'
 import { readWordsFromImage } from '../services/ocr.js'
-import { readWordFile } from '../services/wordFile.js'
+import { isSpreadsheet, readWordFile } from '../services/wordFile.js'
 import { findMeanings } from '../services/translate.js'
 import './UploadPage.css'
 
@@ -72,7 +72,7 @@ function WordRow({ row, canAdd, onChange, onAdd, onRemove }) {
 }
 
 const NOTICE_MS = 4000
-const FILE_ACCEPT = '.csv,.tsv,.txt,text/*,image/*'
+const FILE_ACCEPT = '.xlsx,.csv,.tsv,.txt,text/*,image/*'
 
 // firstUpload: the wordbook is still empty (right after onboarding), so the page invites the first words
 export default function UploadPage({ studyMode, firstUpload = false, onNavigate, onAddWords }) {
@@ -169,14 +169,16 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
 
   const handleFile = async (file) => {
     if (file.type.startsWith('image/')) return handleImage(file)
-    if (!/\.(csv|tsv|txt)$/i.test(file.name) && !file.type.startsWith('text/')) {
-      setNotice({ text: '.csv, .txt 파일이나 사진만 올릴 수 있어요.' })
+    if (!isSpreadsheet(file) && !/\.(csv|tsv|txt)$/i.test(file.name) && !file.type.startsWith('text/')) {
+      setNotice({ text: '엑셀, .csv, .txt 파일이나 사진만 올릴 수 있어요.' })
       return undefined
     }
     try {
       const words = await readWordFile(file)
       if (words.length === 0) {
-        setNotice({ text: "'영단어,뜻' 형식의 줄을 찾지 못했어요." })
+        setNotice({
+          text: isSpreadsheet(file) ? 'A열에 영단어가 있는 줄을 찾지 못했어요.' : "'영단어,뜻' 형식의 줄을 찾지 못했어요.",
+        })
       } else {
         applyWords(words)
         if (words.every((w) => w.meaning.trim())) {
