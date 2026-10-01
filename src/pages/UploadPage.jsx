@@ -46,7 +46,9 @@ function WordRow({ row, canAdd, onChange, onAdd, onRemove }) {
             type="text"
             aria-label="뜻"
             value={row.meaning}
-            placeholder={`뜻 : ${placeholder.meaning}`}
+            // once a word is in (typed, or read from a file / photo with no meaning found), the example
+            // meaning of another word would look like an answer, so only "뜻" is shown
+            placeholder={row.word.trim() ? '뜻' : `뜻 : ${placeholder.meaning}`}
             onChange={(e) => onChange(row.id, 'meaning', e.target.value)}
           />
         </label>
