@@ -157,27 +157,29 @@ export default function LoginPage({ initialMode = 'login', onGuest, onCancel, on
           </p>
         )}
 
-        <button type="submit" className="login-page__submit" disabled={busy}>
-          {busy ? '잠시만요…' : submitLabel}
-        </button>
+        <div className="login-page__actions">
+          <button type="submit" className="login-page__submit" disabled={busy}>
+            {busy ? '잠시만요…' : submitLabel}
+          </button>
 
-        <div className="login-page__links">
-          {mode === 'login' && (
-            <>
-              <button type="button" onClick={() => switchMode('signup')}>
-                회원가입
+          <div className="login-page__links">
+            {mode === 'login' && (
+              <>
+                <button type="button" onClick={() => switchMode('signup')}>
+                  회원가입
+                </button>
+                <span aria-hidden="true">·</span>
+                <button type="button" onClick={() => switchMode('reset')}>
+                  비밀번호 찾기
+                </button>
+              </>
+            )}
+            {(mode === 'signup' || mode === 'reset') && (
+              <button type="button" onClick={() => switchMode('login')}>
+                로그인으로 돌아가기
               </button>
-              <span aria-hidden="true">·</span>
-              <button type="button" onClick={() => switchMode('reset')}>
-                비밀번호 찾기
-              </button>
-            </>
-          )}
-          {(mode === 'signup' || mode === 'reset') && (
-            <button type="button" onClick={() => switchMode('login')}>
-              로그인으로 돌아가기
-            </button>
-          )}
+            )}
+          </div>
         </div>
       </form>
 

@@ -135,6 +135,13 @@
   color: #c0392b;
 }
 
+/* 로그인 버튼 · 회원가입/비밀번호 찾기: same 20px as the fields */
+.login-page__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 .login-page__submit {
   appearance: none;
   -webkit-appearance: none;
