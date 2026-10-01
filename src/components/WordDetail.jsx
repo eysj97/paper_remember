@@ -3,7 +3,7 @@ import { Example, SpeakButton } from './WordText.jsx'
 import { searchUrl } from '../services/search.js'
 import './WordDetail.css'
 
-// several synonyms are typed in one field, separated by commas; repeats and the word itself are dropped
+// comma-separated synonyms -> a list without blanks, repeats or the word itself
 function parseSynonyms(text, word) {
   const seen = new Set([word.toLowerCase()])
   return text
@@ -23,6 +23,8 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState(null)
   const [error, setError] = useState('')
+  const [addingSynonym, setAddingSynonym] = useState(false)
+  const [synonymDraft, setSynonymDraft] = useState('')
   const synonyms = item.synonyms ?? []
 
   useEffect(() => {
@@ -37,12 +39,23 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
       meaning: item.meaning ?? '',
       example: item.example ?? '',
       exampleKo: item.exampleKo ?? '',
-      synonyms: synonyms.join(', '),
+      synonyms,
     })
     setError('')
+    setSynonymDraft('')
+    setAddingSynonym(false)
     setEditing(true)
   }
   const change = (field) => (e) => setDraft((prev) => ({ ...prev, [field]: e.target.value }))
+
+  // synonym chips: × takes one out, + adds (several at once when separated by commas)
+  const removeSynonym = (synonym) =>
+    setDraft((prev) => ({ ...prev, synonyms: prev.synonyms.filter((s) => s !== synonym) }))
+  const addSynonyms = () => {
+    setDraft((prev) => ({ ...prev, synonyms: parseSynonyms([...prev.synonyms, synonymDraft].join(','), prev.word) }))
+    setSynonymDraft('')
+    setAddingSynonym(false)
+  }
 
   // the spelling is the word's key, so it must stay filled in and not clash with another saved word;
   // emptying the English example removes its translation too
@@ -56,7 +69,8 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
       meaning: draft.meaning.trim(),
       example,
       exampleKo: example ? draft.exampleKo.trim() : '',
-      synonyms: parseSynonyms(draft.synonyms, word),
+      // a synonym still being typed counts too
+      synonyms: parseSynonyms([...draft.synonyms, synonymDraft].join(','), word),
     })
     setEditing(false)
     return undefined
@@ -137,15 +151,49 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
                 <p className="word-detail__label">유의어</p>
                 {searchLink('synonyms')}
               </div>
-              <div className="word-detail__example-form">
-                <input
-                  value={draft.synonyms}
-                  autoCapitalize="none"
-                  spellCheck={false}
-                  placeholder="쉼표로 구분 (예: nervous, worried)"
-                  aria-label="유의어"
-                  onChange={change('synonyms')}
-                />
+              <div className="word-detail__tags">
+                {draft.synonyms.map((synonym) => (
+                  <span key={synonym} className="word-detail__synonym">
+                    {synonym}
+                    <button type="button" aria-label={`${synonym} 유의어 삭제`} onClick={() => removeSynonym(synonym)}>
+                      ×
+                    </button>
+                  </span>
+                ))}
+                {addingSynonym ? (
+                  <input
+                    className="word-detail__tag-input"
+                    autoFocus
+                    value={synonymDraft}
+                    autoCapitalize="none"
+                    spellCheck={false}
+                    placeholder="유의어"
+                    aria-label="새 유의어"
+                    onChange={(e) => setSynonymDraft(e.target.value)}
+                    onBlur={addSynonyms}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        // Enter adds the synonym; it must not submit the whole edit form
+                        e.preventDefault()
+                        addSynonyms()
+                      }
+                      if (e.key === 'Escape') {
+                        e.stopPropagation()
+                        setSynonymDraft('')
+                        setAddingSynonym(false)
+                      }
+                    }}
+                  />
+                ) : (
+                  <button
+                    type="button"
+                    className="word-detail__tag-add"
+                    aria-label="유의어 추가"
+                    onClick={() => setAddingSynonym(true)}
+                  >
+                    +
+                  </button>
+                )}
               </div>
             </div>
 

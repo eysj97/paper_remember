@@ -235,3 +235,60 @@
   color: #4c4c4c;
 }
 
+
+/* while editing, each synonym chip carries a × and a round "+" adds more */
+.word-detail__edit .word-detail__synonym {
+  padding-right: 6px;
+  gap: 4px;
+}
+
+.word-detail__synonym button {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1;
+  color: #4c4c4c;
+  cursor: pointer;
+}
+
+.word-detail__tag-input {
+  width: 96px;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px dashed #939393;
+  border-radius: 50px;
+  outline: none;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 18px;
+  color: #4c4c4c;
+}
+
+.word-detail__tag-input:focus {
+  border-color: #4c4c4c;
+}
+
+/* round "+"; it turns into an input once tapped */
+.word-detail__tag-add {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 34px;
+  height: 34px;
+  border: 1px solid #e0e0e0;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  font-size: 18px;
+  line-height: 1;
+  color: #4c4c4c;
+  cursor: pointer;
+}
