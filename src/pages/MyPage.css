@@ -100,9 +100,9 @@
   -webkit-appearance: none;
   width: 100%;
   padding: 18px 20px;
-  border: 1px solid #939393;
+  border: none;
   border-radius: 12px;
-  background: #fff;
+  background: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -143,14 +143,17 @@
   flex-shrink: 0;
 }
 
+/* one bordered box per menu: the row on top, its content opening inside the same box */
 .mypage-menu__group {
+  border: 1px solid #939393;
+  border-radius: 12px;
+  background: #fff;
   display: flex;
   flex-direction: column;
 }
 
-/* an open menu's content, right under its row */
 .mypage-menu__panel {
-  padding: 24px 0 14px;
+  padding: 4px 16px 20px;
   display: flex;
   flex-direction: column;
   gap: 36px;
@@ -510,12 +513,13 @@
 
 .mypage-week {
   width: 100%;
-  padding: 14px 16px;
+  padding: 14px 12px;
   border-radius: 8px;
   background: #e0e0e0;
   display: flex;
   align-items: center;
-  gap: 11px;
+  justify-content: space-between;
+  gap: 4px;
 }
 
 .mypage-week__day {

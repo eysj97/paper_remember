@@ -571,7 +571,7 @@ export default function MyPage({
                   >
                     <span className="mypage-menu__text">
                       <span className="mypage-menu__title">{m.title}</span>
-                      <span className="mypage-menu__summary">{summaries[m.id]}</span>
+                      {!open && <span className="mypage-menu__summary">{summaries[m.id]}</span>}
                     </span>
                     <img className="mypage-menu__arrow" src={open ? arrowUpIcon : arrowDownIcon} alt="" />
                   </button>
