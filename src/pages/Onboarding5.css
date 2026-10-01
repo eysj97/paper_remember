@@ -159,3 +159,8 @@
   font-size: 28px;
   cursor: pointer;
 }
+
+.onboarding5__start:disabled {
+  background: #c4c4c4;
+  cursor: default;
+}

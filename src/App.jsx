@@ -13,6 +13,7 @@ import StudyPage from './pages/StudyPage.jsx'
 import MyPage from './pages/MyPage.jsx'
 import LoginPage, { LoadingPage } from './pages/LoginPage.jsx'
 import { applyAnswer } from './services/study.js'
+import { dateToTime, goalTitle } from './services/goal.js'
 import { loadWordbook, removeWord, saveWordbook, upsertWords } from './services/wordbook.js'
 import { loadProfile, saveProfile } from './services/profile.js'
 import { loadStudyLog, logAnswer, saveStudyLog } from './services/studyLog.js'
@@ -26,6 +27,13 @@ const ONBOARDING_PAGES = [CoverPage, Onboarding2, Onboarding3, Onboarding4, Onbo
 
 // screens shown once onboarding is finished; the bottom nav reaches home / upload / library ('book') / mypage ('user')
 const NAV_SCREENS = ['home', 'upload', 'book', 'user']
+
+// what each onboarding page needs before it lets you go on (pages without a question always can)
+const ONBOARDING_REQUIREMENTS = {
+  2: (p) => Boolean(p.studyMode), // 학습 목적: 시험 / 회화
+  3: (p) => Boolean(goalTitle(p.goal)) && dateToTime(p.goal.endDate) >= dateToTime(p.goal.startDate), // 목표 + 기간
+  4: (p) => p.nickname.trim().length > 0, // 닉네임
+}
 
 const startScreen = (profile, wordbook) => {
   if (!profile.onboardedAt) return null
@@ -253,13 +261,19 @@ export default function App() {
     if (!profile.onboardedAt) updateProfile({ onboardedAt: Date.now() })
     setScreen('upload')
   }
-  const goNext = isLast ? finishOnboarding : () => setPageIndex((i) => i + 1)
+  const canNext = ONBOARDING_REQUIREMENTS[pageIndex]?.(profile) ?? true
+  const goNext = () => {
+    if (!canNext) return
+    if (isLast) finishOnboarding()
+    else setPageIndex((i) => i + 1)
+  }
 
   const Page = ONBOARDING_PAGES[pageIndex]
   return (
     <Page
       onBack={goBack}
       onNext={goNext}
+      canNext={canNext}
       studyMode={studyMode}
       onStudyModeChange={setStudyMode}
       goal={profile.goal}

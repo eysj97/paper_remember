@@ -23,6 +23,12 @@
   visibility: hidden;
 }
 
+.onboarding-header__icon-btn--locked:disabled {
+  visibility: visible;
+  opacity: 0.25;
+  cursor: default;
+}
+
 .onboarding-header__icon-btn img {
   display: block;
   width: 100%;

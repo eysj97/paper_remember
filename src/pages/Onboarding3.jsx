@@ -28,12 +28,12 @@ const OPTIONS = [
 ]
 
 // the chosen purpose lives in App, so later screens can show the matching study mode
-export default function Onboarding3({ onBack, onNext, studyMode, onStudyModeChange }) {
+export default function Onboarding3({ onBack, onNext, canNext = true, studyMode, onStudyModeChange }) {
   const selected = studyMode
 
   return (
     <div className="page onboarding3" data-name="온보딩 3">
-      <OnboardingHeader onBack={onBack} onNext={onNext} />
+      <OnboardingHeader onBack={onBack} onNext={onNext} nextLocked={!canNext} />
       <div className="onboarding3__content">
         <div className="onboarding3__text">
           <h1 className="onboarding3__title">어떤 목적으로 공부를 하시나요?</h1>

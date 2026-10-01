@@ -6,7 +6,7 @@ import { readAvatar } from '../services/profile.js'
 import './Onboarding5.css'
 
 // nickname and picture live in App (profile) so the home header and mypage can show them
-export default function Onboarding5({ onBack, onNext, profile, onProfileChange }) {
+export default function Onboarding5({ onBack, onNext, canNext = true, profile, onProfileChange }) {
   const { nickname } = profile
   const setNickname = (value) => onProfileChange?.({ nickname: value })
   const avatarSrc = profile.avatar ?? avatarPlaceholder
@@ -74,12 +74,12 @@ export default function Onboarding5({ onBack, onNext, profile, onProfileChange }
               </button>
             )}
           </div>
-          <p className="onboarding5__hint">* 닉네임은 10글자를 넘어가면 안되요</p>
+          <p className="onboarding5__hint">* 닉네임을 입력하면 시작할 수 있어요 (10글자까지)</p>
         </div>
       </div>
 
       <div className="onboarding5__footer">
-        <button type="button" className="onboarding5__start" onClick={onNext}>
+        <button type="button" className="onboarding5__start" onClick={onNext} disabled={!canNext}>
           시작하기
         </button>
       </div>
