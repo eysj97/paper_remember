@@ -1,15 +1,13 @@
 import OnboardingHeader from '../components/OnboardingHeader.jsx'
 import GoalDropdown from '../components/GoalDropdown.jsx'
 import DateRangeField from '../components/DateRangeField.jsx'
-import { goalTitle } from '../services/goal.js'
+import { dateToTime } from '../services/goal.js'
 import './Onboarding4.css'
 
 // the goal lives in App (profile.goal) so mypage can show and change it later
 export default function Onboarding4({ onBack, onNext, canNext = true, goal, onGoalChange }) {
   const update = (patch) => onGoalChange?.({ ...goal, ...patch })
-  const todo = !goalTitle(goal)
-    ? '목표를 고르고 값을 입력하면 다음으로 넘어갈 수 있어요.'
-    : '끝나는 날짜가 시작 날짜보다 빠를 수 없어요.'
+  const datesReversed = dateToTime(goal.endDate) < dateToTime(goal.startDate)
 
   return (
     <div className="page onboarding4" data-name="온보딩 4">
@@ -50,7 +48,9 @@ export default function Onboarding4({ onBack, onNext, canNext = true, goal, onGo
             />
           </div>
           <p className="onboarding4__hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
-          {!canNext && <p className="onboarding4__hint onboarding4__hint--todo">{todo}</p>}
+          {datesReversed && (
+            <p className="onboarding4__hint onboarding4__hint--todo">끝나는 날짜가 시작 날짜보다 빠를 수 없어요.</p>
+          )}
         </div>
       </div>
     </div>
