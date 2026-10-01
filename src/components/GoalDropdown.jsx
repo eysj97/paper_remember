@@ -1,41 +1,29 @@
 import { useEffect, useRef, useState } from 'react'
 import arrowDownIcon from '../../imges/icon-downarrow.png'
+import { GOAL_TYPES, goalType } from '../services/goal.js'
 import './GoalDropdown.css'
 
-const TEMPLATES = [
-  { id: 'streak', label: '연속학습', suffix: '일 연속학습하기', inputType: 'number', placeholder: '7' },
-  { id: 'book', label: '한권 끝내기', suffix: ' 한권 끝내기', inputType: 'text', placeholder: '예: Harry Potter' },
-  { id: 'words', label: '단어수', suffix: '단어 외우기', inputType: 'number', placeholder: '100' },
-  { id: 'accuracy', label: '정답률', suffix: '% 정답률 달성하기', inputType: 'number', placeholder: '90' },
-  { id: 'custom', label: '직접 입력', inputType: 'text', placeholder: '나만의 목표를 입력해보세요' },
-]
-
-export default function GoalDropdown({ onChange }) {
+// value: { type, value } of the goal; onChange gets the same shape back
+export default function GoalDropdown({ value, onChange }) {
   const [open, setOpen] = useState(false)
-  const [selected, setSelected] = useState(null) // template object | null
-  const [amount, setAmount] = useState('')
   const inputRef = useRef(null)
+  // focus the amount only right after a type is picked, not when a saved goal is shown
+  const focusNext = useRef(false)
+  const selected = goalType(value)
+  const amount = value?.value ?? ''
 
   useEffect(() => {
-    if (selected) inputRef.current?.focus()
-  }, [selected])
+    if (focusNext.current) inputRef.current?.focus()
+    focusNext.current = false
+  }, [selected?.id])
 
   const selectTemplate = (template) => {
-    setSelected(template)
-    setAmount('')
+    focusNext.current = true
     setOpen(false)
-    onChange?.('')
+    onChange?.({ type: template.id, value: '' })
   }
 
-  const handleAmountChange = (raw) => {
-    setAmount(raw)
-    if (!selected) return
-    if (selected.id === 'custom') {
-      onChange?.(raw)
-    } else {
-      onChange?.(raw ? `${raw}${selected.suffix}` : '')
-    }
-  }
+  const handleAmountChange = (raw) => onChange?.({ type: selected.id, value: raw })
 
   return (
     <div className="goal-dropdown">
@@ -90,7 +78,7 @@ export default function GoalDropdown({ onChange }) {
 
       {open && (
         <div className="goal-dropdown__list">
-          {TEMPLATES.map((template) => (
+          {GOAL_TYPES.map((template) => (
             <button
               type="button"
               key={template.id}

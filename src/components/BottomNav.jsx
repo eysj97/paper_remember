@@ -5,13 +5,14 @@ import uploadWhite from '../assets/nav/upload-white.svg'
 import bookIcon from '../assets/nav/book.svg'
 import bookBlack from '../assets/nav/book-black.svg'
 import userIcon from '../assets/nav/user.svg'
+import userBlack from '../assets/nav/user-black.svg'
 import './BottomNav.css'
 
 const ITEMS = [
   { id: 'home', label: '홈', text: 'home', icon: homeWhite, activeIcon: homeBlack },
   { id: 'upload', label: '업로드', text: 'upload', icon: uploadWhite, activeIcon: uploadBlack },
   { id: 'book', label: '라이브러리', text: 'library', icon: bookIcon, activeIcon: bookBlack },
-  { id: 'user', label: '마이페이지', icon: userIcon },
+  { id: 'user', label: '마이페이지', text: 'my', icon: userIcon, activeIcon: userBlack },
 ]
 
 export default function BottomNav({ active, onNavigate }) {

@@ -17,10 +17,14 @@
 :root {
   --page-width: 430px;
   --page-height: 932px;
+  /* set from main.jsx so the 430x932 frame fills the window height */
+  --page-scale: 1;
 }
 
 body {
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -39,6 +43,7 @@ body {
   position: relative;
   width: var(--page-width);
   height: var(--page-height);
+  zoom: var(--page-scale);
   overflow: hidden;
   background: #fff;
   box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);

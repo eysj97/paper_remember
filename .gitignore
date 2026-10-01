@@ -5,3 +5,7 @@ dist
 
 # 22MB design source, not used by the app (the app uses imges/craft-page-sm.png)
 imges/craft page.png
+
+# server keys (copy .env.example to .env)
+.env
+.env.local

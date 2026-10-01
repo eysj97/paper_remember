@@ -45,10 +45,13 @@
   display: block;
 }
 
+/* centred so 0% through 100% all sit in the ring */
 .home-header__ring-text {
   position: absolute;
-  left: 18px;
+  left: 0;
+  right: 0;
   top: 21px;
+  text-align: center;
   font-weight: 400;
   font-size: 12px;
   line-height: normal;

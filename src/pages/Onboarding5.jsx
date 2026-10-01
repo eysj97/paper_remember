@@ -1,12 +1,15 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import OnboardingHeader from '../components/OnboardingHeader.jsx'
 import avatarPlaceholder from '../../imges/icon-user.png'
 import plusIcon from '../../imges/icon-plus.png'
+import { readAvatar } from '../services/profile.js'
 import './Onboarding5.css'
 
-export default function Onboarding5({ onBack, onNext }) {
-  const [nickname, setNickname] = useState('')
-  const [avatarSrc, setAvatarSrc] = useState(avatarPlaceholder)
+// nickname and picture live in App (profile) so the home header and mypage can show them
+export default function Onboarding5({ onBack, onNext, profile, onProfileChange }) {
+  const { nickname } = profile
+  const setNickname = (value) => onProfileChange?.({ nickname: value })
+  const avatarSrc = profile.avatar ?? avatarPlaceholder
   const fileInputRef = useRef(null)
 
   const handlePickImage = () => {
@@ -15,9 +18,11 @@ export default function Onboarding5({ onBack, onNext }) {
 
   const handleFileChange = (e) => {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setAvatarSrc(url)
+    readAvatar(file)
+      .then((avatar) => onProfileChange?.({ avatar }))
+      .catch(() => {})
   }
 
   return (

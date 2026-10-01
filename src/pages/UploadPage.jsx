@@ -71,7 +71,8 @@ function WordRow({ row, canAdd, onChange, onAdd, onRemove }) {
 const NOTICE_MS = 4000
 const FILE_ACCEPT = '.csv,.tsv,.txt,text/*,image/*'
 
-export default function UploadPage({ studyMode, onNavigate, onAddWords }) {
+// firstUpload: the wordbook is still empty (right after onboarding), so the page invites the first words
+export default function UploadPage({ studyMode, firstUpload = false, onNavigate, onAddWords }) {
   const cameraInputRef = useRef(null)
   const fileInputRef = useRef(null)
   const [cameraOpen, setCameraOpen] = useState(false)
@@ -179,9 +180,23 @@ export default function UploadPage({ studyMode, onNavigate, onAddWords }) {
     <div className="page upload-page" data-name="업로드">
       <div className="upload-page__scroll">
         <div className="upload-page__inner">
-          <UploadHeader studyMode={studyMode} />
+          <UploadHeader
+            studyMode={studyMode}
+            fitBox={firstUpload}
+            {...(firstUpload && { title: '첫 단어를 담아 볼까요?', subtitle: '단어를 담으면 학습이 시작돼요' })}
+          />
 
           <div className="upload-cards">
+            {firstUpload && (
+              <div className="upload-welcome" role="note">
+                <p className="upload-welcome__title">단어장이 아직 비어 있어요</p>
+                <p className="upload-welcome__body">
+                  아래 세 가지 방법 중 편한 걸로 외우고 싶은 단어를 담아 주세요.
+                  <br />
+                  담은 단어로 홈의 오늘의 학습이 만들어져요.
+                </p>
+              </div>
+            )}
             <input
               ref={cameraInputRef}
               type="file"

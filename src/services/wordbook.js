@@ -1,9 +1,9 @@
 // The saved word list, kept in the browser until there is a backend.
-const KEY = 'warld.wordbook'
+export const WORDBOOK_KEY = 'warld.wordbook'
 
 export function loadWordbook() {
   try {
-    const list = JSON.parse(localStorage.getItem(KEY))
+    const list = JSON.parse(localStorage.getItem(WORDBOOK_KEY))
     return Array.isArray(list) ? list : []
   } catch {
     return []
@@ -12,7 +12,7 @@ export function loadWordbook() {
 
 export function saveWordbook(list) {
   try {
-    localStorage.setItem(KEY, JSON.stringify(list))
+    localStorage.setItem(WORDBOOK_KEY, JSON.stringify(list))
   } catch {
     // storage full or blocked: the in-memory list still works for this session
   }

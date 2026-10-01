@@ -5,16 +5,16 @@ import ringProgress from '../assets/home/ring-progress.svg'
 import BottomNav from '../components/BottomNav.jsx'
 import ModeBadge from '../components/ModeBadge.jsx'
 import { buildDailyPlan } from '../services/study.js'
+import { dailyNewFor, goalProgress, goalTitle } from '../services/goal.js'
+import { dayKey, streakDays, totals } from '../services/studyLog.js'
+import { daysSince, timeGreeting } from '../services/greeting.js'
+import useNow from '../hooks/useNow.js'
 import './HomePage.css'
 
-const USER_NAME = 'user name'
-const GOAL_TITLE = '100일간 연속으로 학습하기'
-const GOAL_PERCENT = 3
-const STREAK_DAYS = 3
-
-// today's tasks come from the study rules (new words + reviews due by the forgetting curve)
-function todaysTasks(words, studyMode) {
-  const plan = buildDailyPlan(words, { mode: studyMode })
+// today's tasks come from the study rules (new words + reviews due by the forgetting curve);
+// the goal sets how many new words (a custom goal asks for reviews only)
+function todaysTasks(words, studyMode, goal, now) {
+  const plan = buildDailyPlan(words, { mode: studyMode, now, dailyNew: dailyNewFor(goal, words, now) })
   const tasks = []
   if (plan.new.target > 0) {
     tasks.push({ id: 'new', title: `새로운 영어단어 ${plan.new.target}개 외우기`, percent: plan.new.percent })
@@ -54,8 +54,15 @@ function TaskCard({ title, percent }) {
   )
 }
 
-export default function HomePage({ words = [], studyMode, onNavigate }) {
-  const tasks = todaysTasks(words, studyMode)
+export default function HomePage({ words = [], profile, studyLog = {}, onNavigate }) {
+  const { studyMode, goal } = profile
+  // re-rendered every minute so the greeting and day counts follow the clock past noon or midnight
+  const now = useNow()
+  const tasks = todaysTasks(words, studyMode, goal, now)
+  const streak = streakDays(studyLog, now)
+  const studiedToday = Boolean(studyLog[dayKey(now)])
+  const greeting = timeGreeting(now)
+  const progress = goalProgress(goal, { words, streak, accuracy: totals(studyLog).accuracy })
 
   return (
     <div className="page home-page" data-name="홈">
@@ -66,21 +73,29 @@ export default function HomePage({ words = [], studyMode, onNavigate }) {
           <div className="home-header__ring">
             <img src={ringTrack} alt="" />
             <img src={ringProgress} alt="" />
-            <span className="home-header__ring-text">{GOAL_PERCENT}%</span>
+            {progress && <span className="home-header__ring-text">{progress.percent}%</span>}
           </div>
           <div className="home-header__text">
-            <p className="home-header__user">{USER_NAME}</p>
-            <p className="home-header__goal">{GOAL_TITLE}</p>
+            <p className="home-header__user">{profile.nickname || '닉네임 없음'}</p>
+            <p className="home-header__goal">{goalTitle(goal) || '학습 목표를 정해 주세요'}</p>
           </div>
         </div>
       </header>
 
       <div className="home-page__greeting">
-        <p>안녕하세요! 좋은 아침이예요</p>
-        <p>
-          <span className="home-page__highlight">{STREAK_DAYS}일째</span> 연속학습을 이어가고 있어요
-        </p>
-        <p>오늘도 학습을 이어가 볼까요?</p>
+        <p>{greeting.hello}</p>
+        {streak > 0 ? (
+          <p>
+            <span className="home-page__highlight">{streak}일째</span>{' '}
+            {studiedToday ? '연속학습을 이어가고 있어요' : '연속학습, 오늘도 이어가요'}
+          </p>
+        ) : (
+          // no streak yet (or it was broken): count the days since the start instead
+          <p>
+            종이기억과 함께한 지 <span className="home-page__highlight">{daysSince(profile.onboardedAt, now)}일째</span>예요
+          </p>
+        )}
+        <p>{greeting.invite}</p>
       </div>
 
       <div className="home-page__section">

@@ -1,0 +1,48 @@
+.date-range {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  gap: 8px;
+}
+
+.date-range__select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 180px;
+  height: 51px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 22px 13px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: -0.48px;
+  color: #637381;
+}
+
+.date-range__arrow {
+  width: 12px;
+  height: 6px;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.date-range__arrow--open {
+  transform: scaleY(-1);
+}
+
+.date-range__tilde {
+  font-family: 'Pretendard', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  letter-spacing: -0.48px;
+  color: #637381;
+  flex-shrink: 0;
+}

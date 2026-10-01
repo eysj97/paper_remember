@@ -10,29 +10,120 @@ import ProcessingPage from './pages/ProcessingPage.jsx'
 import ResultPage from './pages/ResultPage.jsx'
 import LibraryPage from './pages/LibraryPage.jsx'
 import StudyPage from './pages/StudyPage.jsx'
+import MyPage from './pages/MyPage.jsx'
+import LoginPage, { LoadingPage } from './pages/LoginPage.jsx'
 import { applyAnswer } from './services/study.js'
 import { loadWordbook, removeWord, saveWordbook, upsertWords } from './services/wordbook.js'
+import { loadProfile, saveProfile } from './services/profile.js'
+import { loadStudyLog, logAnswer, saveStudyLog } from './services/studyLog.js'
+import { clearAllData, STORAGE_KEYS } from './services/backup.js'
+import { loadGuest, saveGuest, serverEnabled, supabase } from './services/supabase.js'
+import { clearMeta, hasData } from './services/sync.js'
+import useAuth from './hooks/useAuth.js'
+import useCloudSync from './hooks/useCloudSync.js'
 
 const ONBOARDING_PAGES = [CoverPage, Onboarding2, Onboarding3, Onboarding4, Onboarding5]
 
-// screens shown once onboarding is finished; the bottom nav reaches home / upload / library ('book')
-const NAV_SCREENS = ['home', 'upload', 'book']
+// screens shown once onboarding is finished; the bottom nav reaches home / upload / library ('book') / mypage ('user')
+const NAV_SCREENS = ['home', 'upload', 'book', 'user']
+
+const startScreen = (profile, wordbook) => {
+  if (!profile.onboardedAt) return null
+  return wordbook.length > 0 ? 'home' : 'upload'
+}
 
 export default function App() {
   const [pageIndex, setPageIndex] = useState(0)
-  const [screen, setScreen] = useState(null)
-  // study purpose picked in onboarding: 'exam' | 'conversation' | null (not chosen yet)
-  const [studyMode, setStudyMode] = useState(null)
+  // nickname, picture, study purpose ('exam' | 'conversation' | null), goal and settings —
+  // filled in during onboarding and changed later in mypage
+  const [profile, setProfile] = useState(loadProfile)
+  const [wordbook, setWordbook] = useState(loadWordbook)
+  // returning visits skip onboarding: home once there are words, otherwise the upload page to get some
+  const [screen, setScreen] = useState(() => startScreen(profile, wordbook))
+  const updateProfile = (patch) => setProfile((prev) => ({ ...prev, ...patch }))
+  const studyMode = profile.studyMode
+  const setStudyMode = (mode) => updateProfile({ studyMode: mode })
+  // answers per day, for streaks and the record charts
+  const [studyLog, setStudyLog] = useState(loadStudyLog)
   const [pendingWords, setPendingWords] = useState([])
   // words with pronunciation / example / synonyms filled in, shown on the result page
   const [enrichedWords, setEnrichedWords] = useState([])
-  const [wordbook, setWordbook] = useState(loadWordbook)
   // which study button was pressed in the library: 'new' | 'review' | 'wrong'
   const [studyKind, setStudyKind] = useState('new')
 
   useEffect(() => {
     saveWordbook(wordbook)
   }, [wordbook])
+  useEffect(() => {
+    saveProfile(profile)
+  }, [profile])
+  useEffect(() => {
+    saveStudyLog(studyLog)
+  }, [studyLog])
+
+  // the app open in another tab saved something: pick it up so this tab doesn't overwrite it later
+  useEffect(() => {
+    const sync = (e) => {
+      if (e.key && !STORAGE_KEYS.includes(e.key)) return
+      setWordbook(loadWordbook())
+      setProfile(loadProfile())
+      setStudyLog(loadStudyLog())
+    }
+    window.addEventListener('storage', sync)
+    return () => window.removeEventListener('storage', sync)
+  }, [])
+
+  // login (server). Without server keys the app stays local-only and never shows the login screen.
+  const auth = useAuth()
+  const [guest, setGuest] = useState(loadGuest)
+  const chooseGuest = (value) => {
+    saveGuest(value)
+    setGuest(value)
+  }
+
+  // the server copy arrived (sign-in, or another device saved meanwhile)
+  const applyRemote = (data) => {
+    setWordbook(data.wordbook)
+    setProfile(data.profile)
+    setStudyLog(data.studyLog)
+    setScreen((current) => current ?? startScreen(data.profile, data.wordbook))
+  }
+  const sync = useCloudSync({ user: auth.user, data: { wordbook, profile, studyLog }, onRemote: applyRemote })
+
+  // signed in from guest mode: the guest data goes into the account (merged by the sync)
+  useEffect(() => {
+    if (auth.user && guest) chooseGuest(false)
+  }, [auth.user, guest])
+
+  // what's on this device belongs to the account, so signing out clears it
+  const signOut = async () => {
+    await sync.flush()
+    await supabase.auth.signOut()
+    clearAllData()
+    clearMeta()
+    setWordbook([])
+    setProfile(loadProfile())
+    setStudyLog({})
+    setPageIndex(0)
+    setScreen(null)
+  }
+
+  // a backup file was restored (it is already stored; this shows it)
+  const applyBackup = (data) => {
+    setWordbook(data.wordbook)
+    setProfile(data.profile)
+    setStudyLog(data.studyLog)
+  }
+
+  // wipe everything and start over from the cover page
+  const resetAll = () => {
+    clearAllData()
+    setWordbook([])
+    setProfile(loadProfile())
+    setStudyLog({})
+    setPageIndex(0)
+    setScreen(null)
+  }
 
   const registerWords = (words, tags) => setWordbook((prev) => upsertWords(prev, words, tags))
 
@@ -51,13 +142,45 @@ export default function App() {
   const deleteWord = (word) => setWordbook((prev) => removeWord(prev, word))
 
   // every answer in a study session moves that word along its review schedule
-  const recordAnswer = (word, correct) =>
+  const recordAnswer = (word, correct) => {
     setWordbook((prev) => prev.map((w) => (w.word === word ? applyAnswer(w, correct) : w)))
+    setStudyLog((prev) => logAnswer(prev, correct))
+  }
+
+  if (!auth.ready) return <LoadingPage />
+  if (auth.recovering) return <LoginPage initialMode="recover" onRecovered={auth.finishRecovery} />
+  if (serverEnabled && !auth.user && !guest) return <LoginPage onGuest={() => chooseGuest(true)} />
+  // first sync on a device with nothing on it yet: wait for the account's data instead of starting onboarding
+  if (sync.status === 'loading' && !hasData({ wordbook, profile, studyLog })) {
+    return <LoadingPage text="단어장을 불러오는 중이에요…" />
+  }
 
   if (screen) {
     const navigate = (id) => NAV_SCREENS.includes(id) && setScreen(id)
 
-    if (screen === 'home') return <HomePage words={wordbook} studyMode={studyMode} onNavigate={navigate} />
+    if (screen === 'home') {
+      return <HomePage words={wordbook} profile={profile} studyLog={studyLog} onNavigate={navigate} />
+    }
+    if (screen === 'user') {
+      return (
+        <MyPage
+          words={wordbook}
+          profile={profile}
+          studyLog={studyLog}
+          onProfileChange={updateProfile}
+          onRestore={applyBackup}
+          onReset={resetAll}
+          account={{
+            serverEnabled,
+            email: auth.user?.email ?? null,
+            syncStatus: sync.status,
+            onSignIn: () => chooseGuest(false),
+            onSignOut: signOut,
+          }}
+          onNavigate={navigate}
+        />
+      )
+    }
     if (screen === 'study') {
       // full screen: no bottom nav while studying
       return (
@@ -113,6 +236,7 @@ export default function App() {
     return (
       <UploadPage
         studyMode={studyMode}
+        firstUpload={wordbook.length === 0}
         onNavigate={navigate}
         onAddWords={(words) => {
           setPendingWords(words)
@@ -124,10 +248,24 @@ export default function App() {
 
   const isLast = pageIndex === ONBOARDING_PAGES.length - 1
   const goBack = pageIndex > 0 ? () => setPageIndex((i) => i - 1) : undefined
-  const goNext = isLast ? () => setScreen('home') : () => setPageIndex((i) => i + 1)
+  // finishing onboarding opens the upload page first, so the first thing to do is put words in
+  const finishOnboarding = () => {
+    if (!profile.onboardedAt) updateProfile({ onboardedAt: Date.now() })
+    setScreen('upload')
+  }
+  const goNext = isLast ? finishOnboarding : () => setPageIndex((i) => i + 1)
 
   const Page = ONBOARDING_PAGES[pageIndex]
   return (
-    <Page onBack={goBack} onNext={goNext} studyMode={studyMode} onStudyModeChange={setStudyMode} />
+    <Page
+      onBack={goBack}
+      onNext={goNext}
+      studyMode={studyMode}
+      onStudyModeChange={setStudyMode}
+      goal={profile.goal}
+      onGoalChange={(goal) => updateProfile({ goal })}
+      profile={profile}
+      onProfileChange={updateProfile}
+    />
   )
 }
