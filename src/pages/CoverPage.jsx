@@ -5,8 +5,11 @@ import './CoverPage.css'
 export default function CoverPage({ onNext, onLogin }) {
   return (
     <div className="page cover-page" data-name="커버" onClick={onNext} role="button" tabIndex={0}>
-      <img className="cover-page__bg" src={coverBg} alt="" />
-      <div className="cover-page__title">종이기억</div>
+      {/* the photo and the title written on its tag move together */}
+      <div className="cover-page__art">
+        <img className="cover-page__bg" src={coverBg} alt="" />
+        <div className="cover-page__title">종이기억</div>
+      </div>
       {onLogin && (
         <button
           type="button"

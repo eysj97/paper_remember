@@ -2,6 +2,17 @@
   background: #fff;
 }
 
+/* the 430x932 design, kept whole and centred: on a shorter or taller screen the photo is cropped
+   (or padded with white) evenly at top and bottom, and the title stays on the big tag */
+.cover-page__art {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 430px;
+  height: 932px;
+  transform: translateY(-50%);
+}
+
 .cover-page__bg {
   position: absolute;
   inset: 0;
