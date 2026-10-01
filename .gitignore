@@ -3,7 +3,7 @@ dist
 *.log
 .claude/
 
-# 22MB design source, not used by the app (the app uses imges/craft-page-sm.png)
+# 22MB design source, not used by the app (the app uses imges/craft-page-sm.avif)
 imges/craft page.png
 
 # server keys (copy .env.example to .env)

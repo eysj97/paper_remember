@@ -1,8 +1,11 @@
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+/* Pretendard split by character ranges: the browser fetches only the pieces the screen uses,
+   instead of a ~750KB file per weight */
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.css');
 
 @font-face {
   font-family: 'GriunXHangeul Sarang seu reo un';
-  src: url('./assets/fonts/GriunXHangeul_SarangSeuReoUn-Rg.ttf') format('truetype');
+  /* cut down to the four letters it ever writes: 종이기억 (1.5MB TTF -> 1.5KB) */
+  src: url('./assets/fonts/GriunXHangeul_SarangSeuReoUn-Rg.subset.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;

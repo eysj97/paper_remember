@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import craftBg from '../../imges/craft-page-sm.png'
+import craftBg from '../../imges/craft-page-sm.avif'
 import { authErrorMessage, supabase } from '../services/supabase.js'
 import './LoginPage.css'
 

@@ -1,4 +1,4 @@
-import volumeIcon from '../../imges/icon-volume.png'
+import volumeIcon from '../../imges/icon-volume.avif'
 import './WordText.css'
 
 // small pieces shared by every screen that shows a saved word (result page, library, word card)

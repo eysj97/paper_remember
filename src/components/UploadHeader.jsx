@@ -1,5 +1,5 @@
 import ModeBadge from './ModeBadge.jsx'
-import craftBg from '../../imges/craft-page-sm.png'
+import craftBg from '../../imges/craft-page-sm.avif'
 import './UploadHeader.css'
 
 // the kraft-paper page header used by the upload flow and the library

@@ -9,7 +9,7 @@ const STOP_WORDS = new Set([
   'this', 'from', 'they', 'have', 'been', 'were', 'will', 'your', 'what', 'when', 'them',
 ])
 
-export function extractWords(text) {
+function extractWords(text) {
   const tokens = text.match(/[A-Za-z][A-Za-z'-]{2,}/g) ?? []
   const seen = new Set()
   const words = []

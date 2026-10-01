@@ -62,7 +62,7 @@
 .study-progress__fill {
   height: 100%;
   border-radius: 4px;
-  background: #d9d9d9 url('../../imges/craft-page-sm.png') center / cover;
+  background: #d9d9d9 url('../../imges/craft-page-sm.avif') center / cover;
   transition: width 0.25s ease;
 }
 
@@ -424,7 +424,7 @@
 }
 
 .study-dialogue__turn--reply .study-dialogue__bubble {
-  background: #d9d9d9 url('../../imges/craft-page-sm.png') center / cover;
+  background: #d9d9d9 url('../../imges/craft-page-sm.avif') center / cover;
 }
 
 .study-dialogue .study-prompt__hint {

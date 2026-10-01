@@ -1,4 +1,4 @@
-import craftBg from '../../imges/craft-page-sm.png'
+import craftBg from '../../imges/craft-page-sm.avif'
 import checkIcon from '../assets/icons/task-check.svg'
 import ringTrack from '../assets/home/ring-track.svg'
 import ringProgress from '../assets/home/ring-progress.svg'

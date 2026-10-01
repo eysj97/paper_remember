@@ -1,7 +1,6 @@
 // Reads word lists from a file:
 //   .csv / .tsv / .txt : "word, meaning" lines (comma, tab, " - " or ":" between the two)
 //   .xlsx              : the first sheet, column A = word and column B = meaning
-import { unzipSync, strFromU8 } from 'fflate'
 
 const WORD_PATTERN = /^[A-Za-z][A-Za-z '-]*$/
 const HEADER_WORDS = new Set(['word', 'words', 'english', '영단어', '단어', '영어'])
@@ -38,7 +37,7 @@ function collectWords(pairs) {
   return words
 }
 
-export function parseWordText(text) {
+function parseWordText(text) {
   const pairs = []
   for (const rawLine of text.split(/\r?\n/)) {
     const line = rawLine.trim()
@@ -67,8 +66,8 @@ function columnIndex(ref) {
 }
 
 function firstSheetPath(files) {
-  const workbook = files['xl/workbook.xml'] && parseXml(strFromU8(files['xl/workbook.xml']))
-  const rels = files['xl/_rels/workbook.xml.rels'] && parseXml(strFromU8(files['xl/_rels/workbook.xml.rels']))
+  const workbook = files['xl/workbook.xml'] && parseXml(files['xl/workbook.xml'])
+  const rels = files['xl/_rels/workbook.xml.rels'] && parseXml(files['xl/_rels/workbook.xml.rels'])
   const sheet = workbook && byTag(workbook, 'sheet')[0]
   const relId = sheet?.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id')
   const target = rels && byTag(rels, 'Relationship').find((r) => r.getAttribute('Id') === relId)?.getAttribute('Target')
@@ -76,16 +75,22 @@ function firstSheetPath(files) {
   return Object.keys(files).filter((name) => /^xl\/worksheets\/sheet\d+\.xml$/.test(name)).sort()[0]
 }
 
-export function parseXlsx(buffer) {
-  const files = unzipSync(new Uint8Array(buffer))
+async function parseXlsx(buffer) {
+  // the unzip library is only fetched when a spreadsheet is actually opened
+  const { unzipSync, strFromU8 } = await import('fflate')
+  const files = Object.fromEntries(
+    Object.entries(unzipSync(new Uint8Array(buffer)))
+      .filter(([name]) => /\.(xml|rels)$/.test(name))
+      .map(([name, bytes]) => [name, strFromU8(bytes)]),
+  )
   const sheetPath = firstSheetPath(files)
   if (!sheetPath || !files[sheetPath]) throw new Error('no sheet')
 
   const shared = files['xl/sharedStrings.xml']
-    ? byTag(parseXml(strFromU8(files['xl/sharedStrings.xml'])), 'si').map(textOf)
+    ? byTag(parseXml(files['xl/sharedStrings.xml']), 'si').map(textOf)
     : []
 
-  const pairs = byTag(parseXml(strFromU8(files[sheetPath])), 'row').map((row) => {
+  const pairs = byTag(parseXml(files[sheetPath]), 'row').map((row) => {
     const cells = []
     for (const cell of byTag(row, 'c')) {
       const type = cell.getAttribute('t')

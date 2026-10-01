@@ -66,7 +66,7 @@ function meaningPieces(meaning) {
 
 // The meaning is graded loosely: any one of the listed meanings counts, a one-letter slip is
 // forgiven for longer answers, and an answer that clearly contains (or is contained in) a meaning is accepted.
-export function isMeaningCorrect(answer, meaning) {
+function isMeaningCorrect(answer, meaning) {
   const given = normalizeKo(answer)
   if (!given) return false
 
@@ -81,11 +81,11 @@ export function isMeaningCorrect(answer, meaning) {
 
 const normalizeEnglish = (text) => text.trim().replace(/\s+/g, ' ').toLowerCase()
 
-export const isSpellingCorrect = (answer, word) => normalizeEnglish(answer) === normalizeEnglish(word)
+const isSpellingCorrect = (answer, word) => normalizeEnglish(answer) === normalizeEnglish(word)
 
 // an own sentence counts when it has a few words and uses the word, inflections included
 // (anxious -> anxiously, make -> making, study -> studied)
-export function isOwnSentence(answer, word) {
+function isOwnSentence(answer, word) {
   if (answer.trim().split(/\s+/).length < MIN_OWN_SENTENCE_WORDS) return false
   const base = word.trim().toLowerCase()
   const stems = new Set([base, base.replace(/e$/, ''), base.replace(/y$/, 'i')].filter((s) => s.length >= 2))
@@ -230,7 +230,7 @@ const BUILDERS = {
 
 // one question for a saved word, or null when the mode has nothing to ask about it. The type is
 // picked at random; one that can't be built (e.g. no other words to choose from) gives way to the next.
-export function makeQuestion(item, mode, allWords = [], random = Math.random) {
+function makeQuestion(item, mode, allWords = [], random = Math.random) {
   for (const type of shuffle(questionTypesFor(item, mode), random)) {
     const question = BUILDERS[type]({ id: `${item.word}-${type}`, type, item }, item, allWords, random)
     if (question) return question

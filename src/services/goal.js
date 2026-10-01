@@ -29,7 +29,7 @@ export function goalTitle(goal) {
 export const isAutoPeriod = (goal) => goal?.type === 'streak'
 export const autoPeriodDays = (goal) => Math.floor(Number(goal?.value))
 
-export function withAutoPeriod(goal, now = Date.now()) {
+function withAutoPeriod(goal, now = Date.now()) {
   const days = autoPeriodDays(goal)
   if (!isAutoPeriod(goal) || !(days > 0)) return goal
   const end = new Date(now)

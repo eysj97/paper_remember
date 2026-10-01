@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import BottomNav from '../components/BottomNav.jsx'
 import UploadHeader from '../components/UploadHeader.jsx'
-import craftBg from '../../imges/craft-page-sm.png'
+import craftBg from '../../imges/craft-page-sm.avif'
 import ringTrack from '../assets/processing/ring-track.svg'
 import { enrichWords } from '../services/dictionary.js'
 import './ProcessingPage.css'

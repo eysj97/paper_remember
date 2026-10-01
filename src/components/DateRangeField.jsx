@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import DateWheelPicker from './DateWheelPicker.jsx'
-import arrowDownIcon from '../../imges/icon-downarrow.png'
+import arrowDownIcon from '../../imges/icon-downarrow.avif'
 import './DateRangeField.css'
 
 const pad2 = (n) => String(n).padStart(2, '0')

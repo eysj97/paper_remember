@@ -1,5 +1,5 @@
 import OnboardingHeader from '../components/OnboardingHeader.jsx'
-import craftBg from '../../imges/craft-page-sm.png'
+import craftBg from '../../imges/craft-page-sm.avif'
 import './Onboarding3.css'
 
 const OPTIONS = [

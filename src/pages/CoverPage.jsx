@@ -1,4 +1,4 @@
-import coverBg from '../../imges/cover.png'
+import coverBg from '../../imges/cover.avif'
 import './CoverPage.css'
 
 // tapping anywhere starts onboarding; onLogin (server connected, signed out) lets returning users skip it

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import arrowDownIcon from '../../imges/icon-downarrow.png'
+import arrowDownIcon from '../../imges/icon-downarrow.avif'
 import { GOAL_TYPES, goalType } from '../services/goal.js'
 import './GoalDropdown.css'
 

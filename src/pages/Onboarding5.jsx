@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import OnboardingHeader from '../components/OnboardingHeader.jsx'
-import avatarPlaceholder from '../../imges/icon-user.png'
-import plusIcon from '../../imges/icon-plus.png'
+import avatarPlaceholder from '../../imges/icon-user.avif'
+import plusIcon from '../../imges/icon-plus.avif'
 import { readAvatar } from '../services/profile.js'
 import './Onboarding5.css'
 

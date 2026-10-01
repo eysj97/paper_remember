@@ -1,4 +1,4 @@
-import arrowIcon from '../../imges/icon-return.png'
+import arrowIcon from '../../imges/icon-return.avif'
 import './OnboardingHeader.css'
 
 // nextLocked: the page still needs an answer, so the next arrow shows but can't be pressed

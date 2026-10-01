@@ -38,8 +38,8 @@ const DAY = 24 * HOUR
 //    days (kept at 30 once reached). A wrong answer resets the word to stage 0 and brings it
 //    back a few hours later the same day. These numbers are tunable parameters, not fixed.
 // ---------------------------------------------------------------------------------------------
-export const REVIEW_INTERVAL_DAYS = [1, 3, 7, 14, 30]
-export const RETRY_AFTER_WRONG_HOURS = 4
+const REVIEW_INTERVAL_DAYS = [1, 3, 7, 14, 30]
+const RETRY_AFTER_WRONG_HOURS = 4
 
 // ---------------------------------------------------------------------------------------------
 // 2. Today's plan (home): new words + reviews that are due
@@ -52,7 +52,7 @@ export const DEFAULT_DAILY_NEW = 10
 //      복습하기         -> due words, the longest-overdue first
 //      오답노트         -> words answered wrong, the most-missed first
 // ---------------------------------------------------------------------------------------------
-export const SESSION_SIZE = 10
+const SESSION_SIZE = 10
 
 const startOfDay = (time) => {
   const d = new Date(time)

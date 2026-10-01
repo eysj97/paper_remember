@@ -78,7 +78,7 @@ button.upload-card {
   align-items: center;
   padding: 16px;
   border-radius: 50px;
-  background: #fff url('../../imges/craft-page-sm.png') center / cover;
+  background: #fff url('../../imges/craft-page-sm.avif') center / cover;
 }
 
 .upload-card__icon img {

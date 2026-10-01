@@ -45,7 +45,7 @@
   padding: 0 14px;
   border: none;
   border-radius: 50px;
-  background: #d9d9d9 url('../../imges/craft-page-sm.png') center / cover;
+  background: #d9d9d9 url('../../imges/craft-page-sm.avif') center / cover;
   font-family: inherit;
   font-weight: 500;
   font-size: 13px;
@@ -90,8 +90,7 @@
   color: #4c4c4c;
 }
 
-.word-detail__example,
-.word-detail__text {
+.word-detail__example {
   padding: 14px 16px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;

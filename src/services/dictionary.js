@@ -91,7 +91,7 @@ function pickExample(examples, term) {
   return pool.find((e) => e.toLowerCase().includes(term)) ?? pool[0] ?? ''
 }
 
-export function parseWiktionary(data, term) {
+function parseWiktionary(data, term) {
   const entries = data?.en ?? []
   const definitions = entries.flatMap((entry) => entry.definitions ?? [])
   const examples = definitions.flatMap((d) => (d.parsedExamples ?? []).map((e) => stripHtml(e.example)))
@@ -107,7 +107,7 @@ export function parseWiktionary(data, term) {
   }
 }
 
-export async function lookupWord(word, signal) {
+async function lookupWord(word, signal) {
   const term = word.trim().toLowerCase()
   const [phonetic, synonyms, wiktionary] = await Promise.all([
     fetchPronunciation(term, signal),

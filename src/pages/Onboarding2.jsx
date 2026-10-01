@@ -1,5 +1,5 @@
 import OnboardingHeader from '../components/OnboardingHeader.jsx'
-import heroImg from '../../imges/onbording1.png'
+import heroImg from '../../imges/onbording1.avif'
 import './Onboarding2.css'
 
 export default function Onboarding2({ onBack, onNext }) {
