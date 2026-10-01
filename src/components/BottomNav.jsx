@@ -13,7 +13,7 @@ const ITEMS = [
   // upload-white.svg is exported with its 58px button box around the glyph, so it's sized as a whole box
   { id: 'upload', label: '업로드', text: 'upload', icon: uploadWhite, activeIcon: uploadBlack, boxedIcon: true },
   { id: 'book', label: '라이브러리', text: 'library', icon: bookIcon, activeIcon: bookBlack },
-  { id: 'user', label: '마이페이지', text: 'my', icon: userIcon, activeIcon: userBlack },
+  { id: 'user', label: '마이페이지', text: 'mypage', icon: userIcon, activeIcon: userBlack },
 ]
 
 export default function BottomNav({ active, onNavigate }) {
