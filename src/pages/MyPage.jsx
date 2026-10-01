@@ -56,7 +56,7 @@ const MODES = [
   },
 ]
 
-const GOAL_UNITS = { streak: '일', words: '개', accuracy: '%', book: '개' }
+const GOAL_UNITS = { streak: '일', words: '개', accuracy: '%' }
 
 const pad2 = (n) => String(n).padStart(2, '0')
 // same "26/10/01" form as the date pickers

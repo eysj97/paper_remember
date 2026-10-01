@@ -7,7 +7,6 @@ const DAY = 24 * 3_600_000
 // labels follow the spec's noun forms; the order keeps 정답률 near the bottom (harder for beginners)
 export const GOAL_TYPES = [
   { id: 'streak', label: '연속 학습', suffix: '일 연속학습하기', inputType: 'number', placeholder: '7' },
-  { id: 'book', label: '한 권 끝내기', suffix: ' 한권 끝내기', inputType: 'text', placeholder: '예: Harry Potter' },
   { id: 'words', label: '단어 수', suffix: '단어 외우기', inputType: 'number', placeholder: '100' },
   { id: 'accuracy', label: '정답률', suffix: '% 정답률 달성하기', inputType: 'number', placeholder: '90' },
   { id: 'custom', label: '직접 입력', inputType: 'text', placeholder: '나만의 목표를 입력해보세요' },
@@ -62,25 +61,17 @@ export function daysLeft(endDate, now = Date.now()) {
   return Math.max(1, Math.round((dateToTime(endDate) - startOfDay(now)) / DAY) + 1)
 }
 
-const sameTitle = (tag, title) => tag.replace(/^#+/, '').trim().toLowerCase() === title.trim().toLowerCase()
-const bookWords = (words, title) => words.filter((w) => (w.tags ?? []).some((tag) => sameTitle(tag, title)))
-
 // where a trackable goal stands; null for a custom or unfinished goal
 //   streak   : consecutive study days      words : words learned so far
-//   accuracy : overall correct answers %   book  : learned share of the words tagged with that book
+//   accuracy : overall correct answers %
 export function goalProgress(goal, { words = [], streak = 0, accuracy = 0 } = {}) {
   if (!isTrackable(goal) || !goalTitle(goal)) return null
 
   let current = 0
-  let target = Number(goal.value) || 0
+  const target = Number(goal.value) || 0
   if (goal.type === 'streak') current = streak
   else if (goal.type === 'words') current = words.filter((w) => w.learned).length
   else if (goal.type === 'accuracy') current = accuracy
-  else if (goal.type === 'book') {
-    const list = bookWords(words, String(goal.value))
-    current = list.filter((w) => w.learned).length
-    target = list.length
-  }
 
   const percent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0
   return { current, target, percent }
@@ -98,11 +89,6 @@ export function dailyNewFor(goal, words = [], now = Date.now()) {
   if (goal.type === 'words') {
     const left = (Number(goal.value) || 0) - words.filter(learnedBeforeToday).length
     return Math.ceil(Math.max(0, left) / days)
-  }
-  if (goal.type === 'book') {
-    const list = bookWords(words, String(goal.value))
-    if (list.length === 0) return DEFAULT_DAILY_NEW
-    return Math.ceil(list.filter((w) => !learnedBeforeToday(w)).length / days)
   }
   return DEFAULT_DAILY_NEW
 }
