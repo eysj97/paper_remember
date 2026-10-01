@@ -103,46 +103,48 @@ export default function LoginPage({ initialMode = 'login', onGuest, onCancel, on
           <p className="login-page__body">{body}</p>
         </div>
 
-        {mode !== 'recover' && (
-          <label className="login-page__field">
-            <span className="login-page__label">이메일</span>
-            <input
-              type="email"
-              className="login-page__input"
-              autoComplete="email"
-              placeholder="example@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-        )}
+        <div className="login-page__fields">
+          {mode !== 'recover' && (
+            <label className="login-page__field">
+              <span className="login-page__label">이메일</span>
+              <input
+                type="email"
+                className="login-page__input"
+                autoComplete="email"
+                placeholder="example@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+          )}
 
-        {mode !== 'reset' && (
-          <label className="login-page__field">
-            <span className="login-page__label">비밀번호</span>
-            <input
-              type="password"
-              className="login-page__input"
-              autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-              placeholder="6자 이상"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-        )}
+          {mode !== 'reset' && (
+            <label className="login-page__field">
+              <span className="login-page__label">비밀번호</span>
+              <input
+                type="password"
+                className="login-page__input"
+                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                placeholder="6자 이상"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+          )}
 
-        {(mode === 'signup' || mode === 'recover') && (
-          <label className="login-page__field">
-            <span className="login-page__label">비밀번호 확인</span>
-            <input
-              type="password"
-              className="login-page__input"
-              autoComplete="new-password"
-              value={passwordCheck}
-              onChange={(e) => setPasswordCheck(e.target.value)}
-            />
-          </label>
-        )}
+          {(mode === 'signup' || mode === 'recover') && (
+            <label className="login-page__field">
+              <span className="login-page__label">비밀번호 확인</span>
+              <input
+                type="password"
+                className="login-page__input"
+                autoComplete="new-password"
+                value={passwordCheck}
+                onChange={(e) => setPasswordCheck(e.target.value)}
+              />
+            </label>
+          )}
+        </div>
 
         {error && (
           <p className="login-page__message login-page__message--error" role="alert">
