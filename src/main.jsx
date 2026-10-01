@@ -9,10 +9,22 @@ requestPersistentStorage()
 const PAGE_WIDTH = 430
 const PAGE_HEIGHT = 932
 
-// scale the fixed-size page to the window height (shrinking further if the window is too narrow)
+// The screens are laid out on a 430px-wide page.
+//   phone (narrow window): the page fills the screen width, and its height stretches to whatever
+//                          the screen has left (it changes as the browser's address bar shows/hides)
+//   wider window (PC)    : the 430x932 page is shown whole, scaled to the window height
+const PHONE_MAX_WIDTH = 600
+
 function updatePageScale() {
-  const scale = Math.min(window.innerHeight / PAGE_HEIGHT, window.innerWidth / PAGE_WIDTH)
-  document.documentElement.style.setProperty('--page-scale', String(scale))
+  const width = window.innerWidth
+  // innerHeight leaves out the on-screen keyboard on iPhone, so typing doesn't squeeze the page
+  const height = window.innerHeight
+  const phone = width <= PHONE_MAX_WIDTH
+  const scale = phone ? width / PAGE_WIDTH : Math.min(height / PAGE_HEIGHT, width / PAGE_WIDTH)
+  const root = document.documentElement
+  root.style.setProperty('--page-scale', String(scale))
+  root.style.setProperty('--page-height', `${phone ? height / scale : PAGE_HEIGHT}px`)
+  root.classList.toggle('phone', phone)
 }
 updatePageScale()
 window.addEventListener('resize', updatePageScale)

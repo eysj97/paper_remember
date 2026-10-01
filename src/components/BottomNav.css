@@ -1,8 +1,9 @@
-/* 60px bar; its bottom edge stays where the 70px bar's was (47px above the screen bottom) */
+/* 60px bar, 47px above the bottom of the screen (pinned to the bottom so it stays put when the
+   page height follows a phone screen) */
 .bottom-nav {
   position: absolute;
   left: 50%;
-  top: 825px;
+  bottom: 47px;
   transform: translateX(-50%);
   width: 390px;
   height: 60px;

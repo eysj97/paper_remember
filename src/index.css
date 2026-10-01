@@ -39,6 +39,15 @@ body {
   justify-content: center;
 }
 
+/* on a phone the page is the whole screen: no grey surround, no frame shadow */
+.phone body {
+  background: #fff;
+}
+
+.phone .page {
+  box-shadow: none;
+}
+
 .page {
   position: relative;
   width: var(--page-width);
