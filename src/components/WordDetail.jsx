@@ -3,18 +3,26 @@ import { Example, SpeakButton } from './WordText.jsx'
 import { searchUrl } from '../services/search.js'
 import './WordDetail.css'
 
-// word card: word - meaning - example - pronunciation - synonyms
+// several synonyms are typed in one field, separated by commas; repeats and the word itself are dropped
+function parseSynonyms(text, word) {
+  const seen = new Set([word.toLowerCase()])
+  return text
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => {
+      const key = s.toLowerCase()
+      if (!s || seen.has(key)) return false
+      seen.add(key)
+      return true
+    })
+}
+
+// word card: word - meaning - example - pronunciation - synonyms. Everything is edited from one 수정.
 // isTaken(word): whether another saved word already has that spelling
 export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken }) {
-  const [editingWord, setEditingWord] = useState(false)
-  const [wordDraft, setWordDraft] = useState('')
-  const [meaningDraft, setMeaningDraft] = useState('')
-  const [wordError, setWordError] = useState('')
-  const [editingExample, setEditingExample] = useState(false)
-  const [exampleDraft, setExampleDraft] = useState('')
-  const [exampleKoDraft, setExampleKoDraft] = useState('')
-  const [addingSynonym, setAddingSynonym] = useState(false)
-  const [synonymDraft, setSynonymDraft] = useState('')
+  const [editing, setEditing] = useState(false)
+  const [draft, setDraft] = useState(null)
+  const [error, setError] = useState('')
   const synonyms = item.synonyms ?? []
 
   useEffect(() => {
@@ -23,58 +31,48 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [onClose])
 
-  const startWordEdit = () => {
-    setWordDraft(item.word)
-    setMeaningDraft(item.meaning ?? '')
-    setWordError('')
-    setEditingWord(true)
+  const startEdit = () => {
+    setDraft({
+      word: item.word,
+      meaning: item.meaning ?? '',
+      example: item.example ?? '',
+      exampleKo: item.exampleKo ?? '',
+      synonyms: synonyms.join(', '),
+    })
+    setError('')
+    setEditing(true)
   }
+  const change = (field) => (e) => setDraft((prev) => ({ ...prev, [field]: e.target.value }))
 
-  // the spelling is the word's key, so it must stay filled in and not clash with another saved word
-  const saveWord = () => {
-    const word = wordDraft.trim().replace(/\s+/g, ' ')
-    if (!word) return setWordError('영단어를 입력해 주세요.')
-    if (word.toLowerCase() !== item.word.toLowerCase() && isTaken?.(word)) return setWordError('이미 있는 단어예요.')
-    onUpdate(item.word, { word, meaning: meaningDraft.trim() })
-    setEditingWord(false)
+  // the spelling is the word's key, so it must stay filled in and not clash with another saved word;
+  // emptying the English example removes its translation too
+  const save = () => {
+    const word = draft.word.trim().replace(/\s+/g, ' ')
+    if (!word) return setError('영단어를 입력해 주세요.')
+    if (word.toLowerCase() !== item.word.toLowerCase() && isTaken?.(word)) return setError('이미 있는 단어예요.')
+    const example = draft.example.trim()
+    onUpdate(item.word, {
+      word,
+      meaning: draft.meaning.trim(),
+      example,
+      exampleKo: example ? draft.exampleKo.trim() : '',
+      synonyms: parseSynonyms(draft.synonyms, word),
+    })
+    setEditing(false)
     return undefined
   }
-
-  const startExampleEdit = () => {
-    setExampleDraft(item.example ?? '')
-    setExampleKoDraft(item.exampleKo ?? '')
-    setEditingExample(true)
-  }
-
-  // emptying the English sentence removes the example (and its translation) again
-  const saveExample = () => {
-    const example = exampleDraft.trim()
-    onUpdate(item.word, { example, exampleKo: example ? exampleKoDraft.trim() : '' })
-    setEditingExample(false)
-  }
-
-  // several synonyms can be typed at once, separated by commas
-  const addSynonyms = () => {
-    const typed = synonymDraft.split(',').map((s) => s.trim()).filter(Boolean)
-    setSynonymDraft('')
-    setAddingSynonym(false)
-    const known = new Set(synonyms.map((s) => s.toLowerCase()))
-    const fresh = typed.filter((s) => {
-      const key = s.toLowerCase()
-      if (known.has(key) || key === item.word.toLowerCase()) return false
-      known.add(key)
-      return true
-    })
-    if (fresh.length > 0) onUpdate(item.word, { synonyms: [...synonyms, ...fresh] })
-  }
-
-  const removeSynonym = (synonym) => onUpdate(item.word, { synonyms: synonyms.filter((s) => s !== synonym) })
 
   const handleDelete = () => {
     if (!window.confirm(`'${item.word}' 단어를 삭제할까요?`)) return
     onDelete(item.word)
     onClose()
   }
+
+  const searchLink = (kind) => (
+    <a className="word-detail__link" href={searchUrl(item.word, kind)} target="_blank" rel="noopener noreferrer">
+      네이버 영어사전에서 검색 ↗
+    </a>
+  )
 
   return (
     <div className="word-detail" role="dialog" aria-modal="true" aria-label={`${item.word} 단어 카드`}>
@@ -85,33 +83,75 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
           단어 삭제
         </button>
 
-        {editingWord ? (
+        {editing ? (
           <form
-            className="word-detail__example-form word-detail__word-form"
+            className="word-detail__edit"
             onSubmit={(e) => {
               e.preventDefault()
-              saveWord()
+              save()
             }}
             onKeyDown={(e) => {
               if (e.key === 'Escape') {
                 e.stopPropagation()
-                setEditingWord(false)
+                setEditing(false)
               }
             }}
           >
-            <input
-              autoFocus
-              value={wordDraft}
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              aria-label="영단어"
-              onChange={(e) => setWordDraft(e.target.value)}
-            />
-            <input value={meaningDraft} aria-label="뜻" onChange={(e) => setMeaningDraft(e.target.value)} />
-            {wordError && <p className="word-detail__error">{wordError}</p>}
+            <div className="word-detail__example-form word-detail__word-form">
+              <input
+                autoFocus
+                value={draft.word}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                aria-label="영단어"
+                onChange={change('word')}
+              />
+              <input value={draft.meaning} aria-label="뜻" onChange={change('meaning')} />
+            </div>
+
+            <div className="word-detail__block">
+              <div className="word-detail__label-row">
+                <p className="word-detail__label">예문</p>
+                {searchLink('example')}
+              </div>
+              <div className="word-detail__example-form">
+                <textarea
+                  rows={2}
+                  value={draft.example}
+                  placeholder={`영어 예문 (예: I like ${item.word}.)`}
+                  aria-label="영어 예문"
+                  onChange={change('example')}
+                />
+                <input
+                  value={draft.exampleKo}
+                  placeholder="한국어 번역 (선택)"
+                  aria-label="한국어 번역"
+                  onChange={change('exampleKo')}
+                />
+              </div>
+            </div>
+
+            <div className="word-detail__block">
+              <div className="word-detail__label-row">
+                <p className="word-detail__label">유의어</p>
+                {searchLink('synonyms')}
+              </div>
+              <div className="word-detail__example-form">
+                <input
+                  value={draft.synonyms}
+                  autoCapitalize="none"
+                  spellCheck={false}
+                  placeholder="쉼표로 구분 (예: nervous, worried)"
+                  aria-label="유의어"
+                  onChange={change('synonyms')}
+                />
+              </div>
+            </div>
+
+            {error && <p className="word-detail__error">{error}</p>}
             <div className="word-detail__example-actions">
-              <button type="button" onClick={() => setEditingWord(false)}>
+              <button type="button" onClick={() => setEditing(false)}>
                 취소
               </button>
               <button type="submit" className="word-detail__save">
@@ -131,134 +171,43 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken 
 
             <div className="word-detail__label-row">
               <p className="word-detail__meaning">{item.meaning}</p>
-              <button type="button" className="word-detail__link" onClick={startWordEdit}>
+              <button type="button" className="word-detail__link" onClick={startEdit}>
                 수정
               </button>
+            </div>
+
+            <div className="word-detail__block">
+              <div className="word-detail__label-row">
+                <p className="word-detail__label">예문</p>
+                {!item.example && searchLink('example')}
+              </div>
+              {item.example ? (
+                <div className="word-detail__example">
+                  <Example sentence={item.example} word={item.word} />
+                  {item.exampleKo && <p>{item.exampleKo}</p>}
+                </div>
+              ) : (
+                <p className="word-detail__example-empty">검색한 예문을 붙여넣어 보세요</p>
+              )}
+            </div>
+
+            <div className="word-detail__block">
+              <div className="word-detail__label-row">
+                <p className="word-detail__label">유의어</p>
+                {synonyms.length === 0 && searchLink('synonyms')}
+              </div>
+              {synonyms.length > 0 && (
+                <div className="word-detail__tags">
+                  {synonyms.map((synonym) => (
+                    <span key={synonym} className="word-detail__synonym">
+                      {synonym}
+                    </span>
+                  ))}
+                </div>
+              )}
             </div>
           </>
         )}
-
-        <div className="word-detail__block">
-          <div className="word-detail__label-row">
-            <p className="word-detail__label">예문</p>
-            {item.example && !editingExample ? (
-              <button type="button" className="word-detail__link" onClick={startExampleEdit}>
-                수정
-              </button>
-            ) : (
-              <a
-                className="word-detail__link"
-                href={searchUrl(item.word, 'example')}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                네이버 영어사전에서 검색 ↗
-              </a>
-            )}
-          </div>
-
-          {editingExample ? (
-            <form
-              className="word-detail__example-form"
-              onSubmit={(e) => {
-                e.preventDefault()
-                saveExample()
-              }}
-              onKeyDown={(e) => {
-                if (e.key === 'Escape') {
-                  e.stopPropagation()
-                  setEditingExample(false)
-                }
-              }}
-            >
-              <textarea
-                autoFocus
-                rows={2}
-                value={exampleDraft}
-                placeholder={`영어 예문 (예: I like ${item.word}.)`}
-                aria-label="영어 예문"
-                onChange={(e) => setExampleDraft(e.target.value)}
-              />
-              <input
-                value={exampleKoDraft}
-                placeholder="한국어 번역 (선택)"
-                aria-label="한국어 번역"
-                onChange={(e) => setExampleKoDraft(e.target.value)}
-              />
-              <div className="word-detail__example-actions">
-                <button type="button" onClick={() => setEditingExample(false)}>
-                  취소
-                </button>
-                <button type="submit" className="word-detail__save">
-                  저장
-                </button>
-              </div>
-            </form>
-          ) : item.example ? (
-            <div className="word-detail__example">
-              <Example sentence={item.example} word={item.word} />
-              {item.exampleKo && <p>{item.exampleKo}</p>}
-            </div>
-          ) : (
-            <button type="button" className="word-detail__example-empty" onClick={startExampleEdit}>
-              <span>+</span> 검색한 예문을 붙여넣어 보세요
-            </button>
-          )}
-        </div>
-
-        <div className="word-detail__block">
-          <div className="word-detail__label-row">
-            <p className="word-detail__label">유의어</p>
-            {(synonyms.length === 0 || addingSynonym) && (
-              <a
-                className="word-detail__link"
-                href={searchUrl(item.word, 'synonyms')}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                네이버 영어사전에서 검색 ↗
-              </a>
-            )}
-          </div>
-          <div className="word-detail__tags">
-            {synonyms.map((synonym) => (
-              <span key={synonym} className="word-detail__synonym">
-                {synonym}
-                <button type="button" aria-label={`${synonym} 유의어 삭제`} onClick={() => removeSynonym(synonym)}>
-                  ×
-                </button>
-              </span>
-            ))}
-            {addingSynonym ? (
-              <input
-                className="word-detail__tag-input"
-                autoFocus
-                value={synonymDraft}
-                placeholder="유의어"
-                aria-label="새 유의어"
-                onChange={(e) => setSynonymDraft(e.target.value)}
-                onBlur={addSynonyms}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') e.currentTarget.blur()
-                  if (e.key === 'Escape') {
-                    e.stopPropagation()
-                    setSynonymDraft('')
-                    setAddingSynonym(false)
-                  }
-                }}
-              />
-            ) : (
-              <button
-                type="button"
-                className="word-detail__tag-add"
-                aria-label="유의어 추가"
-                onClick={() => setAddingSynonym(true)}
-              >
-                +
-              </button>
-            )}
-          </div>
-        </div>
       </div>
     </div>
   )
