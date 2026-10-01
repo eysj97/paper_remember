@@ -95,7 +95,8 @@ export default function HomePage({ words = [], profile, studyLog = {}, onNavigat
             종이기억과 함께한 지 <span className="home-page__highlight">{daysSince(profile.onboardedAt, now)}일째</span>예요
           </p>
         )}
-        <p>{greeting.invite}</p>
+        {/* the day onboarding was finished there is nothing to review yet */}
+        <p>{profile.onboardedAt && daysSince(profile.onboardedAt, now) === 1 ?'이제 시작해볼까요?' : greeting.invite}</p>
       </div>
 
       <div className="home-page__section">
