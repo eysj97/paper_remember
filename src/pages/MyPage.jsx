@@ -2,7 +2,8 @@ import { useRef, useState } from 'react'
 import craftBg from '../../imges/craft-page-sm.png'
 import avatarPlaceholder from '../../imges/icon-user.png'
 import plusIcon from '../../imges/icon-plus.png'
-import arrowIcon from '../../imges/icon-return.png'
+import arrowDownIcon from '../../imges/icon-downarrow.png'
+import arrowUpIcon from '../../imges/icon-uparrow.png'
 import BottomNav from '../components/BottomNav.jsx'
 import ModeBadge from '../components/ModeBadge.jsx'
 import GoalDropdown from '../components/GoalDropdown.jsx'
@@ -62,12 +63,12 @@ const pad2 = (n) => String(n).padStart(2, '0')
 // same "26/10/01" form as the date pickers
 const formatDate = ({ year, month, day }) => `${String(year).slice(2)}/${pad2(month)}/${pad2(day)}`
 
-// the four mypage menus, in the order of the design frames
+// the four mypage menus (학습 목적 -> 목표 -> 학습 현황 -> 설정); each opens in place
 const MENUS = [
-  { id: 'goal', title: '학습목표 설정', subtitle: '목적 · 목표 · 세부목표를 정해요' },
-  { id: 'account', title: '설정', subtitle: '계정 · 프로필 · 알림 · 데이터를 관리해요' },
-  { id: 'trend', title: '학습 현황', subtitle: '지금까지의 학습을 돌아봐요' },
-  { id: 'mode', title: '학습목적 변경', subtitle: '시험대비와 회화 중에 골라요' },
+  { id: 'mode', title: '학습목적 변경' },
+  { id: 'goal', title: '학습목표 설정' },
+  { id: 'trend', title: '학습 현황' },
+  { id: 'account', title: '설정' },
 ]
 
 function ProgressBar({ percent }) {
@@ -514,14 +515,31 @@ export default function MyPage({
   onWithdraw,
   onNavigate,
 }) {
-  const [menu, setMenu] = useState(null) // null = menu list | 'goal' | 'account' | 'trend' | 'mode'
-  const current = MENUS.find((m) => m.id === menu)
+  // the menus open in place, one at a time: the arrow flips and the content shows underneath
+  const [openMenu, setOpenMenu] = useState(null) // null | 'goal' | 'account' | 'trend' | 'mode'
 
   const summaries = {
     goal: goalTitle(profile.goal) || '아직 목표를 정하지 않았어요',
     account: `${account?.email || profile.nickname || '닉네임 없음'} · 알림 ${profile.reminder.enabled ? profile.reminder.time : '꺼짐'}`,
     trend: `${streakDays(studyLog)}일 연속 · 정답률 ${totals(studyLog).accuracy}%`,
     mode: MODE_NAMES[profile.studyMode] ?? '아직 고르지 않았어요',
+  }
+
+  const panels = {
+    goal: <GoalSection words={words} profile={profile} studyLog={studyLog} onProfileChange={onProfileChange} />,
+    account: (
+      <AccountSection
+        words={words}
+        profile={profile}
+        studyLog={studyLog}
+        onProfileChange={onProfileChange}
+        onRestore={onRestore}
+        onWithdraw={onWithdraw}
+        account={account}
+      />
+    ),
+    trend: <TrendSection words={words} studyLog={studyLog} studyMode={profile.studyMode} />,
+    mode: <ModeSection words={words} profile={profile} onProfileChange={onProfileChange} />,
   }
 
   return (
@@ -531,59 +549,37 @@ export default function MyPage({
           <header className="mypage-header">
             <img className="mypage-header__bg" src={craftBg} alt="" />
             <ModeBadge studyMode={profile.studyMode} />
-            {current ? (
-              <>
-                <button type="button" className="mypage-header__back" aria-label="마이페이지로" onClick={() => setMenu(null)}>
-                  <img src={arrowIcon} alt="" />
-                </button>
-                <div className="mypage-header__content">
-                  <div className="mypage-header__text">
-                    <p className="mypage-header__title">{current.title}</p>
-                    <p className="mypage-header__sub">{current.subtitle}</p>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <div className="mypage-header__content">
-                <img className="mypage-header__avatar" src={profile.avatar ?? avatarPlaceholder} alt="" />
-                <div className="mypage-header__text">
-                  <p className="mypage-header__sub">{profile.nickname || '닉네임 없음'}</p>
-                  <p className="mypage-header__title">{profile.goal.aim || '마이페이지'}</p>
-                </div>
+            <div className="mypage-header__content">
+              <img className="mypage-header__avatar" src={profile.avatar ?? avatarPlaceholder} alt="" />
+              <div className="mypage-header__text">
+                <p className="mypage-header__sub">{profile.nickname || '닉네임 없음'}</p>
+                <p className="mypage-header__title">{profile.goal.aim || '마이페이지'}</p>
               </div>
-            )}
+            </div>
           </header>
 
-          {!current && (
-            <nav className="mypage-menu" aria-label="마이페이지 메뉴">
-              {MENUS.map((m) => (
-                <button key={m.id} type="button" className="mypage-menu__item" onClick={() => setMenu(m.id)}>
-                  <span className="mypage-menu__text">
-                    <span className="mypage-menu__title">{m.title}</span>
-                    <span className="mypage-menu__summary">{summaries[m.id]}</span>
-                  </span>
-                  <img className="mypage-menu__arrow" src={arrowIcon} alt="" />
-                </button>
-              ))}
-            </nav>
-          )}
-
-          {menu === 'goal' && (
-            <GoalSection words={words} profile={profile} studyLog={studyLog} onProfileChange={onProfileChange} />
-          )}
-          {menu === 'account' && (
-            <AccountSection
-              words={words}
-              profile={profile}
-              studyLog={studyLog}
-              onProfileChange={onProfileChange}
-              onRestore={onRestore}
-              onWithdraw={onWithdraw}
-              account={account}
-            />
-          )}
-          {menu === 'trend' && <TrendSection words={words} studyLog={studyLog} studyMode={profile.studyMode} />}
-          {menu === 'mode' && <ModeSection words={words} profile={profile} onProfileChange={onProfileChange} />}
+          <div className="mypage-menu">
+            {MENUS.map((m) => {
+              const open = openMenu === m.id
+              return (
+                <div key={m.id} className="mypage-menu__group">
+                  <button
+                    type="button"
+                    className="mypage-menu__item"
+                    aria-expanded={open}
+                    onClick={() => setOpenMenu(open ? null : m.id)}
+                  >
+                    <span className="mypage-menu__text">
+                      <span className="mypage-menu__title">{m.title}</span>
+                      <span className="mypage-menu__summary">{summaries[m.id]}</span>
+                    </span>
+                    <img className="mypage-menu__arrow" src={open ? arrowUpIcon : arrowDownIcon} alt="" />
+                  </button>
+                  {open && <div className="mypage-menu__panel">{panels[m.id]}</div>}
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
 

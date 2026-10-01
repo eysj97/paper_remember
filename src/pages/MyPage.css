@@ -43,26 +43,6 @@
   object-fit: cover;
 }
 
-.mypage-header__back {
-  appearance: none;
-  -webkit-appearance: none;
-  position: absolute;
-  left: 20px;
-  top: 20px;
-  width: 24px;
-  height: 24px;
-  padding: 0;
-  border: none;
-  background: none;
-  cursor: pointer;
-}
-
-.mypage-header__back img {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 .mypage-header__content {
   position: absolute;
   left: 50%;
@@ -156,13 +136,24 @@
   color: #4c4c4c;
 }
 
-/* the back arrow, flipped to point forward */
+/* down arrow while closed, up arrow while open (14x8 icons) */
 .mypage-menu__arrow {
-  width: 20px;
-  height: 20px;
+  width: 14px;
+  height: 8px;
   flex-shrink: 0;
-  transform: scaleX(-1);
-  opacity: 0.6;
+}
+
+.mypage-menu__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* an open menu's content, right under its row */
+.mypage-menu__panel {
+  padding: 24px 0 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
 }
 
 /* ---------- sections ---------- */
