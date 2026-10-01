@@ -61,10 +61,11 @@ export function totals(log) {
 
 const WEEKDAYS = ['일', '월', '화', '수', '목', '금', '토']
 
-// the last `count` days, oldest first, for the record chart
-export function recentDays(log, count = 7, now = Date.now()) {
-  return Array.from({ length: count }, (_, i) => {
-    const time = shiftDays(now, i - count + 1)
+// this week, Monday through Sunday, for the weekly study row (future days simply have no answers)
+export function weekDays(log, now = Date.now()) {
+  const sinceMonday = (new Date(now).getDay() + 6) % 7
+  return Array.from({ length: 7 }, (_, i) => {
+    const time = shiftDays(now, i - sinceMonday)
     const day = log[dayKey(time)] ?? { answered: 0, correct: 0 }
     return { key: dayKey(time), label: WEEKDAYS[new Date(time).getDay()], ...day }
   })

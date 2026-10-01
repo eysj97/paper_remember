@@ -18,7 +18,7 @@ import {
   isAutoPeriod,
   isTrackable,
 } from '../services/goal.js'
-import { recentDays, streakDays, totals } from '../services/studyLog.js'
+import { streakDays, totals, weekDays } from '../services/studyLog.js'
 import { readAvatar } from '../services/profile.js'
 import { downloadBackup, restoreBackup } from '../services/backup.js'
 import './MyPage.css'
@@ -390,14 +390,13 @@ function AccountSection({ words, profile, studyLog, account, onProfileChange, on
   )
 }
 
-// ---------- 학습추이: totals + the last 7 days ----------
+// ---------- 학습추이: totals + this week ----------
 function TrendSection({ words, studyLog }) {
   const streak = streakDays(studyLog)
   const { answered, accuracy } = totals(studyLog)
   const learned = words.filter((w) => w.learned).length
   const wrong = words.filter((w) => w.wrongCount > 0).length
-  const days = recentDays(studyLog)
-  const maxAnswered = Math.max(1, ...days.map((d) => d.answered))
+  const week = weekDays(studyLog)
 
   const stats = [
     { label: '연속 학습', value: `${streak}일` },
@@ -420,25 +419,24 @@ function TrendSection({ words, studyLog }) {
         </div>
       </section>
 
+      {/* 주간학습현황 (Figma 80:30): Mon–Sun, days with at least one answer get the kraft fill */}
       <section className="mypage-section">
-        <h2 className="mypage-section__title">
-          최근 7일 <span>푼 문제 수</span>
-        </h2>
-        <div className="mypage-chart">
-          {days.map((d, i) => (
-            <div key={d.key} className={`mypage-chart__col${i === days.length - 1 ? ' mypage-chart__col--today' : ''}`}>
-              <span className="mypage-chart__count">{d.answered}</span>
-              <div className="mypage-chart__track">
-                <span
-                  className="mypage-chart__fill"
-                  style={{ height: `${(d.answered / maxAnswered) * 100}%`, backgroundImage: `url(${craftBg})` }}
-                />
-              </div>
-              <span className="mypage-chart__day">{i === days.length - 1 ? '오늘' : d.label}</span>
-            </div>
-          ))}
+        <h2 className="mypage-week__title">주간학습현황</h2>
+        <div className="mypage-week">
+          {week.map((d) => {
+            const studied = d.answered > 0
+            return (
+              <span
+                key={d.key}
+                className={`mypage-week__day${studied ? ' mypage-week__day--studied' : ''}`}
+                style={studied ? { backgroundImage: `url(${craftBg})` } : undefined}
+                aria-label={`${d.label}요일 ${studied ? `${d.answered}문제 학습` : '학습 안 함'}`}
+              >
+                {d.label}
+              </span>
+            )
+          })}
         </div>
-        <p className="mypage-hint">* 지금까지 {answered}문제를 풀었어요.</p>
       </section>
     </>
   )
