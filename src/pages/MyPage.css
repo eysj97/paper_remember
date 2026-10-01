@@ -274,7 +274,7 @@
 .mypage-button {
   appearance: none;
   -webkit-appearance: none;
-  flex: 1;
+  flex-shrink: 0;
   height: 45px;
   border: none;
   border-radius: 50px;
@@ -283,6 +283,11 @@
   font-size: 16px;
   color: #fff;
   cursor: pointer;
+}
+
+/* side by side (백업 저장 / 불러오기): split the row; elsewhere a button keeps its 45px height */
+.mypage-buttons .mypage-button {
+  flex: 1;
 }
 
 /* ---------- cards ---------- */
