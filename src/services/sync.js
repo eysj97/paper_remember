@@ -3,6 +3,7 @@
 // The browser copy stays the working copy; the server copy follows it and is pulled on login.
 import { supabase } from './supabase.js'
 import { normalizeProfile } from './profile.js'
+import { lastStudiedAt } from './study.js'
 
 const TABLE = 'user_data'
 
@@ -66,7 +67,7 @@ export async function pushRemote(userId, { wordbook, profile, studyLog }) {
 export const hasData = ({ wordbook, profile, studyLog }) =>
   wordbook.length > 0 || Boolean(profile.onboardedAt) || Object.keys(studyLog).length > 0
 
-const wordTime = (w) => Math.max(w.lastReviewedAt ?? 0, w.addedAt ?? 0)
+const wordTime = (w) => Math.max(lastStudiedAt(w), w.addedAt ?? 0)
 
 // guest data meeting an existing account: keep both, preferring the more recently touched copy
 export function mergeData(local, remote) {

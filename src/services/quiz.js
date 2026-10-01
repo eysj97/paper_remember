@@ -191,12 +191,13 @@ const BUILDERS = {
       random,
     ),
 
-  // with no other meaning to choose from, the meaning is typed instead
-  contextMeaning: (q, item, all, random) => {
-    const question = { ...q, sentence: item.example }
-    const wrong = pickDistractors(item, all, (w) => w.meaning, random).map((w) => w.meaning)
-    return withChoices(question, item.meaning, wrong, random) ?? { ...question, choices: null }
-  },
+  contextMeaning: (q, item, all, random) =>
+    withChoices(
+      { ...q, sentence: item.example },
+      item.meaning,
+      pickDistractors(item, all, (w) => w.meaning, random).map((w) => w.meaning),
+      random,
+    ),
 
   arrange: (q, item, all, random) => {
     const tokens = item.example.trim().split(/\s+/)
@@ -253,7 +254,6 @@ export function gradeAnswer(question, answer) {
   }
   switch (type) {
     case 'meaning':
-    case 'contextMeaning':
       return isMeaningCorrect(answer, item.meaning)
     case 'spelling':
     case 'letterBlank':

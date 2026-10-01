@@ -90,11 +90,6 @@ export default function LibraryPage({ words = [], studyMode, onNavigate, onStart
               ))
             )}
 
-            {words.length === 0 && (
-              <button type="button" className="library-add" onClick={() => onNavigate?.('upload')}>
-                단어 추가하기
-              </button>
-            )}
           </section>
         </div>
       </div>

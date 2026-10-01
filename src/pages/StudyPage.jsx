@@ -23,7 +23,7 @@ const EMPTY_MESSAGES = {
 
 const TITLES = { new: '새로운 단어 암기', review: '복습하기', wrong: '오답노트' }
 
-const TYPED_PLACEHOLDERS = { meaning: '뜻 입력', contextMeaning: '뜻 입력', makeSentence: '영어 문장 입력' }
+const TYPED_PLACEHOLDERS = { meaning: '뜻 입력', makeSentence: '영어 문장 입력' }
 
 // the sentence with the studied word underlined (contextMeaning)
 function UnderlinedSentence({ sentence, word }) {
@@ -404,7 +404,7 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
 
   const inFeedback = phase === 'feedback'
   const { type } = question
-  const typedType = TYPED_TYPES.has(type) || (type === 'contextMeaning' && !question.choices)
+  const typedType = TYPED_TYPES.has(type)
   const chipType = CHIP_TYPES.has(type)
   const chipById = (id) => question.chips?.find((chip) => chip.id === id)
   const pool = question.chips?.filter((chip) => !placed.includes(chip.id)) ?? []

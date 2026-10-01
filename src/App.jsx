@@ -154,7 +154,7 @@ export default function App() {
 
   // every answer in a study session moves that word along its review schedule
   const recordAnswer = (word, correct) => {
-    setWordbook((prev) => prev.map((w) => (w.word === word ? applyAnswer(w, correct) : w)))
+    setWordbook((prev) => prev.map((w) => (w.word === word ? applyAnswer(w, correct, studyMode) : w)))
     setStudyLog((prev) => logAnswer(prev, correct))
   }
 

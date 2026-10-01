@@ -7,7 +7,7 @@ import BottomNav from '../components/BottomNav.jsx'
 import ModeBadge from '../components/ModeBadge.jsx'
 import GoalDropdown from '../components/GoalDropdown.jsx'
 import DateRangeField from '../components/DateRangeField.jsx'
-import { buildDailyPlan, isEligible } from '../services/study.js'
+import { buildDailyPlan, isEligible, progressOf } from '../services/study.js'
 import {
   autoPeriodDays,
   changeGoal,
@@ -404,11 +404,11 @@ function AccountSection({ words, profile, studyLog, account, onProfileChange, on
 }
 
 // ---------- 학습추이: totals + this week ----------
-function TrendSection({ words, studyLog }) {
+function TrendSection({ words, studyLog, studyMode }) {
   const streak = streakDays(studyLog)
   const { answered, accuracy } = totals(studyLog)
-  const learned = words.filter((w) => w.learned).length
-  const wrong = words.filter((w) => w.wrongCount > 0).length
+  const learned = words.filter((w) => progressOf(w, studyMode).learned).length
+  const wrong = words.filter((w) => progressOf(w, studyMode).wrongCount > 0).length
   const week = weekDays(studyLog)
 
   const stats = [
@@ -580,7 +580,7 @@ export default function MyPage({
               account={account}
             />
           )}
-          {menu === 'trend' && <TrendSection words={words} studyLog={studyLog} />}
+          {menu === 'trend' && <TrendSection words={words} studyLog={studyLog} studyMode={profile.studyMode} />}
           {menu === 'mode' && <ModeSection words={words} profile={profile} onProfileChange={onProfileChange} />}
         </div>
       </div>

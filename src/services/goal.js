@@ -1,6 +1,6 @@
 // The study goal (spec 4): 목적 (free text, mypage only) -> 목표 (type + value + period) -> 세부목표
 // (today's amount, worked out by the app). Dates are kept as { year, month, day } like the pickers.
-import { DEFAULT_DAILY_NEW } from './study.js'
+import { DEFAULT_DAILY_NEW, isLearnedInAnyMode, progressOf } from './study.js'
 
 const DAY = 24 * 3_600_000
 
@@ -70,7 +70,7 @@ export function goalProgress(goal, { words = [], streak = 0, accuracy = 0 } = {}
   let current = 0
   const target = Number(goal.value) || 0
   if (goal.type === 'streak') current = streak
-  else if (goal.type === 'words') current = words.filter((w) => w.learned).length
+  else if (goal.type === 'words') current = words.filter(isLearnedInAnyMode).length
   else if (goal.type === 'accuracy') current = accuracy
 
   const percent = target > 0 ? Math.min(100, Math.round((current / target) * 100)) : 0
@@ -84,7 +84,9 @@ export function dailyNewFor(goal, words = [], now = Date.now()) {
   if (!goalTitle(goal)) return DEFAULT_DAILY_NEW
   if (goal.type === 'custom') return 0
 
-  const learnedBeforeToday = (w) => w.learned && (w.learnedAt ?? 0) < startOfDay(now)
+  // learned (in either mode) before today
+  const learnedBeforeToday = (w) =>
+    ['exam', 'conversation'].some((m) => progressOf(w, m).learned && (progressOf(w, m).learnedAt ?? 0) < startOfDay(now))
   const days = daysLeft(goal.endDate, now)
   if (goal.type === 'words') {
     const left = (Number(goal.value) || 0) - words.filter(learnedBeforeToday).length
