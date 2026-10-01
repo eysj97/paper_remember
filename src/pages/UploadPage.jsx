@@ -222,16 +222,6 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
           />
 
           <div className="upload-cards">
-            {firstUpload && (
-              <div className="upload-welcome" role="note">
-                <p className="upload-welcome__title">단어장이 아직 비어 있어요</p>
-                <p className="upload-welcome__body">
-                  아래 세 가지 방법 중 편한 걸로 외우고 싶은 단어를 담아 주세요.
-                  <br />
-                  담은 단어로 홈의 오늘의 학습이 만들어져요.
-                </p>
-              </div>
-            )}
             <input
               ref={cameraInputRef}
               type="file"

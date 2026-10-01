@@ -19,31 +19,6 @@
   padding: 164px 20px 140px;
 }
 
-/* ---------- first visit: invitation above the cards ---------- */
-.upload-welcome {
-  width: 100%;
-  padding: 16px 20px;
-  border-radius: 12px;
-  background: #d9d9d9 url('../../imges/craft-page-sm.png') center / cover;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #000;
-}
-
-.upload-welcome__title {
-  font-weight: 700;
-  font-size: 18px;
-  line-height: normal;
-  color: #fff;
-}
-
-.upload-welcome__body {
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
 /* ---------- option cards ---------- */
 .upload-cards {
   width: 390px;
