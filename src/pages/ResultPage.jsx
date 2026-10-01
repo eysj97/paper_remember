@@ -161,6 +161,10 @@ export default function ResultPage({ words = [], studyMode, onRegister, onReplac
                   </button>
                 )}
               </div>
+              {/* the words are already saved (tags included), so this just closes the step */}
+              <button type="button" className="result-confirm" onClick={() => onNavigate?.('book')}>
+                확인
+              </button>
             </section>
 
             <section className="result-section">
