@@ -48,9 +48,6 @@ export default function Onboarding4({ onBack, onNext, canNext = true, goal, onGo
               onEndChange={(endDate) => update({ endDate })}
               locked={autoPeriod}
             />
-            {autoPeriod && (
-              <p className="onboarding4__hint">* 연속 학습은 오늘부터 {autoPeriodDays(goal)}일로 기간이 자동으로 정해져요.</p>
-            )}
           </div>
           <p className="onboarding4__hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
           {datesReversed && (

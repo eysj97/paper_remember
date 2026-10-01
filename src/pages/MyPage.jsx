@@ -92,9 +92,6 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
           onEndChange={(endDate) => update({ endDate })}
           locked={autoPeriod}
         />
-        {autoPeriod && (
-          <p className="mypage-hint">* 연속 학습은 오늘부터 {autoPeriodDays(goal)}일로 기간이 자동으로 정해져요.</p>
-        )}
         <p className="mypage-hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
 
         {title && (
