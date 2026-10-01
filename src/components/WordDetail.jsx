@@ -1,19 +1,20 @@
 import { useEffect, useState } from 'react'
 import { Example, SpeakButton } from './WordText.jsx'
 import { searchUrl } from '../services/search.js'
-import { normalizeTag } from '../services/tags.js'
 import './WordDetail.css'
 
-// word card: word - meaning - example - pronunciation - synonyms - tags (tags can be edited here)
-export default function WordDetail({ item, onClose, onUpdate, onDelete }) {
-  const [draft, setDraft] = useState('')
-  const [adding, setAdding] = useState(false)
+// word card: word - meaning - example - pronunciation - synonyms
+// isTaken(word): whether another saved word already has that spelling
+export default function WordDetail({ item, onClose, onUpdate, onDelete, isTaken }) {
+  const [editingWord, setEditingWord] = useState(false)
+  const [wordDraft, setWordDraft] = useState('')
+  const [meaningDraft, setMeaningDraft] = useState('')
+  const [wordError, setWordError] = useState('')
   const [editingExample, setEditingExample] = useState(false)
   const [exampleDraft, setExampleDraft] = useState('')
   const [exampleKoDraft, setExampleKoDraft] = useState('')
   const [addingSynonym, setAddingSynonym] = useState(false)
   const [synonymDraft, setSynonymDraft] = useState('')
-  const tags = item.tags ?? []
   const synonyms = item.synonyms ?? []
 
   useEffect(() => {
@@ -22,11 +23,21 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete }) {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [onClose])
 
-  const addTag = () => {
-    const tag = normalizeTag(draft)
-    setDraft('')
-    setAdding(false)
-    if (tag && !tags.includes(tag)) onUpdate(item.word, { tags: [...tags, tag] })
+  const startWordEdit = () => {
+    setWordDraft(item.word)
+    setMeaningDraft(item.meaning ?? '')
+    setWordError('')
+    setEditingWord(true)
+  }
+
+  // the spelling is the word's key, so it must stay filled in and not clash with another saved word
+  const saveWord = () => {
+    const word = wordDraft.trim().replace(/\s+/g, ' ')
+    if (!word) return setWordError('영단어를 입력해 주세요.')
+    if (word.toLowerCase() !== item.word.toLowerCase() && isTaken?.(word)) return setWordError('이미 있는 단어예요.')
+    onUpdate(item.word, { word, meaning: meaningDraft.trim() })
+    setEditingWord(false)
+    return undefined
   }
 
   const startExampleEdit = () => {
@@ -59,8 +70,6 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete }) {
 
   const removeSynonym = (synonym) => onUpdate(item.word, { synonyms: synonyms.filter((s) => s !== synonym) })
 
-  const removeTag = (tag) => onUpdate(item.word, { tags: tags.filter((t) => t !== tag) })
-
   const handleDelete = () => {
     if (!window.confirm(`'${item.word}' 단어를 삭제할까요?`)) return
     onDelete(item.word)
@@ -76,15 +85,58 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete }) {
           단어 삭제
         </button>
 
-        <div className="word-detail__head">
-          <p className="word-detail__word">{item.word}</p>
-          <div className="word-detail__pron">
-            {item.phonetic && <span>{item.phonetic}</span>}
-            <SpeakButton word={item.word} />
-          </div>
-        </div>
+        {editingWord ? (
+          <form
+            className="word-detail__example-form word-detail__word-form"
+            onSubmit={(e) => {
+              e.preventDefault()
+              saveWord()
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                e.stopPropagation()
+                setEditingWord(false)
+              }
+            }}
+          >
+            <input
+              autoFocus
+              value={wordDraft}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              aria-label="영단어"
+              onChange={(e) => setWordDraft(e.target.value)}
+            />
+            <input value={meaningDraft} aria-label="뜻" onChange={(e) => setMeaningDraft(e.target.value)} />
+            {wordError && <p className="word-detail__error">{wordError}</p>}
+            <div className="word-detail__example-actions">
+              <button type="button" onClick={() => setEditingWord(false)}>
+                취소
+              </button>
+              <button type="submit" className="word-detail__save">
+                저장
+              </button>
+            </div>
+          </form>
+        ) : (
+          <>
+            <div className="word-detail__head">
+              <p className="word-detail__word">{item.word}</p>
+              <div className="word-detail__pron">
+                {item.phonetic && <span>{item.phonetic}</span>}
+                <SpeakButton word={item.word} />
+              </div>
+            </div>
 
-        {item.meaning && <p className="word-detail__meaning">{item.meaning}</p>}
+            <div className="word-detail__label-row">
+              <p className="word-detail__meaning">{item.meaning}</p>
+              <button type="button" className="word-detail__link" onClick={startWordEdit}>
+                수정
+              </button>
+            </div>
+          </>
+        )}
 
         <div className="word-detail__block">
           <div className="word-detail__label-row">
@@ -201,49 +253,6 @@ export default function WordDetail({ item, onClose, onUpdate, onDelete }) {
                 className="word-detail__tag-add"
                 aria-label="유의어 추가"
                 onClick={() => setAddingSynonym(true)}
-              >
-                +
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="word-detail__block">
-          <p className="word-detail__label">태그</p>
-          <div className="word-detail__tags">
-            {tags.map((tag) => (
-              <span key={tag} className="word-detail__tag">
-                {tag}
-                <button type="button" aria-label={`${tag} 태그 삭제`} onClick={() => removeTag(tag)}>
-                  ×
-                </button>
-              </span>
-            ))}
-            {adding ? (
-              <input
-                className="word-detail__tag-input"
-                autoFocus
-                value={draft}
-                maxLength={12}
-                placeholder="#태그"
-                aria-label="새 태그"
-                onChange={(e) => setDraft(e.target.value)}
-                onBlur={addTag}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') e.currentTarget.blur()
-                  if (e.key === 'Escape') {
-                    e.stopPropagation()
-                    setDraft('')
-                    setAdding(false)
-                  }
-                }}
-              />
-            ) : (
-              <button
-                type="button"
-                className="word-detail__tag-add"
-                aria-label="태그 추가"
-                onClick={() => setAdding(true)}
               >
                 +
               </button>

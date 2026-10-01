@@ -96,69 +96,6 @@
   color: #000;
 }
 
-/* ---------- filters ---------- */
-.library-filters {
-  display: flex;
-  gap: 6px;
-  padding: 4px;
-  border: 1px solid #e0e0e0;
-  border-radius: 50px;
-}
-
-.library-filters__tab {
-  appearance: none;
-  -webkit-appearance: none;
-  flex: 1;
-  height: 36px;
-  border: none;
-  border-radius: 50px;
-  background: none;
-  font-family: inherit;
-  font-weight: 400;
-  font-size: 14px;
-  color: #4c4c4c;
-  cursor: pointer;
-}
-
-.library-filters__tab--active {
-  background: #4c4c4c;
-  color: #fff;
-}
-
-.library-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding-top: 4px;
-}
-
-.library-chip {
-  appearance: none;
-  -webkit-appearance: none;
-  height: 34px;
-  padding: 0 14px;
-  border: 1px solid #e0e0e0;
-  border-radius: 50px;
-  background: #fff;
-  font-family: inherit;
-  font-size: 14px;
-  line-height: 18px;
-  color: #4c4c4c;
-  cursor: pointer;
-}
-
-.library-chip span {
-  margin-left: 2px;
-  font-size: 12px;
-  opacity: 0.7;
-}
-
-.library-chip--active {
-  border-color: #4c4c4c;
-  background: #4c4c4c;
-  color: #fff;
-}
-
 /* ---------- word list ---------- */
 .library-word {
   appearance: none;
@@ -204,14 +141,6 @@
   letter-spacing: -0.36px;
 }
 
-.library-word__tags {
-  margin-top: 6px;
-  font-weight: 400;
-  font-size: 12px;
-  line-height: 18px;
-  color: #4c4c4c;
-}
-
 .library-empty {
   padding: 28px 0;
   text-align: center;
@@ -255,52 +184,3 @@
   white-space: nowrap;
 }
 
-/* ---------- 단어 목록 header: title on the left, filter icon on the right ---------- */
-.library-section__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.library-sliders {
-  appearance: none;
-  -webkit-appearance: none;
-  position: relative;
-  width: 36px;
-  height: 36px;
-  margin-right: -6px;
-  border: none;
-  border-radius: 50%;
-  background: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
-.library-sliders--open {
-  background: #e0e0e0;
-}
-
-.library-sliders img {
-  display: block;
-  width: 24px;
-  height: 24px;
-}
-
-.library-sliders__dot {
-  position: absolute;
-  right: 4px;
-  top: 4px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #4c4c4c;
-  border: 1.5px solid #fff;
-}
-
-.library-filter-panel {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}

@@ -24,12 +24,12 @@ export function removeWord(list, word) {
 }
 
 // adds new words and updates ones already saved (matched case-insensitively)
-export function upsertWords(list, words, tags = []) {
+export function upsertWords(list, words) {
   const byWord = new Map(list.map((w) => [w.word.toLowerCase(), w]))
   for (const word of words) {
     const key = word.word.toLowerCase()
     const existing = byWord.get(key)
-    byWord.set(key, { ...existing, ...word, tags, addedAt: existing?.addedAt ?? Date.now() })
+    byWord.set(key, { ...existing, ...word, addedAt: existing?.addedAt ?? Date.now() })
   }
   return [...byWord.values()]
 }

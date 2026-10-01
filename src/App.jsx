@@ -136,7 +136,7 @@ export default function App() {
     setScreen(null)
   }
 
-  const registerWords = (words, tags) => setWordbook((prev) => upsertWords(prev, words, tags))
+  const registerWords = (words) => setWordbook((prev) => upsertWords(prev, words))
 
   // a misspelled word is swapped for the corrected one (or dropped if that one is already listed)
   const replaceWord = (oldWord, next) => {

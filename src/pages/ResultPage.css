@@ -41,79 +41,12 @@
   color: #000;
 }
 
-.result-section__intro {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
 .result-section__title {
   font-weight: 700;
   font-size: 18px;
   line-height: 18px;
   letter-spacing: -0.54px;
   white-space: nowrap;
-}
-
-.result-section__hint {
-  height: 25px;
-  display: flex;
-  align-items: center;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 18px;
-  letter-spacing: -0.42px;
-  white-space: nowrap;
-}
-
-/* ---------- tags ---------- */
-.result-tags {
-  width: 377px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.result-tag {
-  appearance: none;
-  -webkit-appearance: none;
-  height: 50px;
-  padding: 13px 22px 13px 16px;
-  border: 1px solid #e0e0e0;
-  border-radius: 50px;
-  background: #fff;
-  font-family: inherit;
-  font-weight: 400;
-  font-size: 16px;
-  line-height: 18px;
-  letter-spacing: -0.48px;
-  color: #4c4c4c;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.result-tag--selected {
-  border-color: #4c4c4c;
-  background: #4c4c4c;
-  color: #fff;
-}
-
-.result-tag--add {
-  width: 50px;
-  padding: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.result-tag--input {
-  width: 110px;
-  outline: none;
-  cursor: text;
-}
-
-.result-tag--input:focus {
-  border-color: #4c4c4c;
 }
 
 /* ---------- result cards ---------- */

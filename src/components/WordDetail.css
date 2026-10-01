@@ -110,36 +110,12 @@
   gap: 8px;
 }
 
-.word-detail__tag,
 .word-detail__tag-input {
   height: 34px;
   border-radius: 50px;
   font-family: inherit;
   font-size: 14px;
   line-height: 18px;
-}
-
-.word-detail__tag {
-  padding: 0 6px 0 14px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  background: #4c4c4c;
-  color: #fff;
-}
-
-.word-detail__tag button {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 22px;
-  height: 22px;
-  border: none;
-  background: none;
-  font-family: inherit;
-  font-size: 16px;
-  line-height: 1;
-  color: #fff;
-  cursor: pointer;
 }
 
 .word-detail__tag-input {
@@ -155,7 +131,7 @@
   border-color: #4c4c4c;
 }
 
-/* round "+" like the tag chips elsewhere; it turns into an input once tapped */
+/* round "+"; it turns into an input once tapped */
 .word-detail__tag-add {
   appearance: none;
   -webkit-appearance: none;
@@ -250,6 +226,21 @@
 .word-detail__example-form textarea:focus,
 .word-detail__example-form input:focus {
   border-color: #4c4c4c;
+}
+
+/* spelling + meaning edit: leaves room on the right for the 단어 삭제 button */
+.word-detail__word-form {
+  padding-right: 96px;
+}
+
+.word-detail__word-form input:first-child {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.word-detail__error {
+  font-size: 13px;
+  color: #c62828;
 }
 
 .word-detail__example-actions {
