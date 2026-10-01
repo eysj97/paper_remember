@@ -43,3 +43,22 @@ create policy "user_data update own" on public.user_data
 drop policy if exists "user_data delete own" on public.user_data;
 create policy "user_data delete own" on public.user_data
   for delete using (auth.uid() = user_id);
+
+-- 탈퇴하기: 로그인한 본인 계정을 삭제한다 (user_data 줄도 on delete cascade 로 함께 지워짐).
+-- 앱은 계정 삭제 권한이 없어서, 본인 것만 지울 수 있는 이 함수를 대신 부른다.
+create or replace function public.delete_my_account()
+returns void
+language plpgsql
+security definer
+set search_path = ''
+as $$
+begin
+  if auth.uid() is null then
+    raise exception 'not signed in';
+  end if;
+  delete from auth.users where id = auth.uid();
+end;
+$$;
+
+revoke all on function public.delete_my_account() from public, anon;
+grant execute on function public.delete_my_account() to authenticated;

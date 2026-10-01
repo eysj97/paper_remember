@@ -126,14 +126,24 @@ export default function App() {
     setStudyLog(data.studyLog)
   }
 
-  // wipe everything and start over from the cover page
-  const resetAll = () => {
+  // 탈퇴: a signed-in account is deleted on the server (its saved row goes with it), then this
+  // device is wiped and the app starts over from the cover page
+  const withdraw = async () => {
+    if (auth.user) {
+      const { error } = await supabase.rpc('delete_my_account')
+      if (error) throw new Error('탈퇴하지 못했어요. 잠시 후 다시 시도해 주세요.')
+      // the account is gone, so only the session kept in this browser needs clearing
+      await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
+    }
     clearAllData()
+    clearMeta()
+    chooseGuest(false)
     setWordbook([])
     setProfile(loadProfile())
     setStudyLog({})
     setPageIndex(0)
     setScreen(null)
+    setLoginFirst(false)
   }
 
   const registerWords = (words) => setWordbook((prev) => upsertWords(prev, words))
@@ -186,7 +196,7 @@ export default function App() {
           studyLog={studyLog}
           onProfileChange={updateProfile}
           onRestore={applyBackup}
-          onReset={resetAll}
+          onWithdraw={withdraw}
           account={{
             serverEnabled,
             email: auth.user?.email ?? null,

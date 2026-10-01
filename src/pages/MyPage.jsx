@@ -253,7 +253,7 @@ function AccountBlock({ account }) {
   )
 }
 
-function AccountSection({ words, profile, studyLog, account, onProfileChange, onRestore, onReset }) {
+function AccountSection({ words, profile, studyLog, account, onProfileChange, onRestore, onWithdraw }) {
   const fileInputRef = useRef(null)
   const backupInputRef = useRef(null)
   const [notice, setNotice] = useState('')
@@ -286,10 +286,20 @@ function AccountSection({ words, profile, studyLog, account, onProfileChange, on
       .catch((err) => setDataNotice(err.message))
   }
 
-  const handleReset = () => {
-    const where = account?.email ? '이 기기와 서버에서 ' : ''
-    if (!window.confirm(`단어장, 학습 기록, 프로필이 ${where}모두 지워지고 처음 화면으로 돌아가요. 지울까요?`)) return
-    onReset?.()
+  const [withdrawing, setWithdrawing] = useState(false)
+  // signed in: the account and everything saved with it is deleted; otherwise this device's data
+  const handleWithdraw = async () => {
+    const what = account?.email
+      ? '계정과 단어장, 학습 기록이 모두 삭제되고 되돌릴 수 없어요.'
+      : '이 기기에 저장된 단어장, 학습 기록, 프로필이 모두 삭제돼요.'
+    if (!window.confirm(`탈퇴하면 ${what} 탈퇴할까요?`)) return
+    setWithdrawing(true)
+    try {
+      await onWithdraw?.()
+    } catch (err) {
+      setDataNotice(err.message)
+      setWithdrawing(false)
+    }
   }
 
   return (
@@ -387,17 +397,9 @@ function AccountSection({ words, profile, studyLog, account, onProfileChange, on
           * 단어장과 기록은 이 기기의 브라우저에 자동으로 저장돼요. 다른 기기로 옮기거나 브라우저 데이터를 지우기 전에는 백업
           파일을 저장해 두세요.
         </p>
-        <button type="button" className="mypage-link mypage-link--danger" onClick={handleReset}>
-          모든 데이터 지우기
+        <button type="button" className="mypage-link mypage-link--danger" onClick={handleWithdraw} disabled={withdrawing}>
+          {withdrawing ? '탈퇴하는 중…' : '탈퇴하기'}
         </button>
-      </section>
-
-      <section className="mypage-section">
-        <h2 className="mypage-section__title">기타</h2>
-        <div className="mypage-row">
-          <span className="mypage-row__label">앱 버전</span>
-          <span className="mypage-row__value">0.0.1</span>
-        </div>
       </section>
     </>
   )
@@ -509,7 +511,7 @@ export default function MyPage({
   account,
   onProfileChange,
   onRestore,
-  onReset,
+  onWithdraw,
   onNavigate,
 }) {
   const [menu, setMenu] = useState(null) // null = menu list | 'goal' | 'account' | 'trend' | 'mode'
@@ -576,7 +578,7 @@ export default function MyPage({
               studyLog={studyLog}
               onProfileChange={onProfileChange}
               onRestore={onRestore}
-              onReset={onReset}
+              onWithdraw={onWithdraw}
               account={account}
             />
           )}
