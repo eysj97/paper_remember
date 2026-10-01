@@ -40,6 +40,10 @@ const MODES = [
 
 const GOAL_UNITS = { streak: '일', words: '개', accuracy: '%', book: '개' }
 
+const pad2 = (n) => String(n).padStart(2, '0')
+// same "26/10/01" form as the date pickers
+const formatDate = ({ year, month, day }) => `${String(year).slice(2)}/${pad2(month)}/${pad2(day)}`
+
 // the four mypage menus, in the order of the design frames
 const MENUS = [
   { id: 'goal', title: '학습목표 설정', subtitle: '목적 · 목표 · 세부목표를 정해요' },
@@ -61,6 +65,7 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
   const { goal, studyMode } = profile
   const update = (patch) => onProfileChange({ goal: changeGoal(goal, patch) })
   const autoPeriod = isAutoPeriod(goal) && autoPeriodDays(goal) > 0
+  const [editingGoal, setEditingGoal] = useState(false)
 
   const title = goalTitle(goal)
   const progress = goalProgress(goal, { words, streak: streakDays(studyLog), accuracy: totals(studyLog).accuracy })
@@ -82,24 +87,49 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
       </section>
 
       <section className="mypage-section">
-        <h2 className="mypage-section__title">목표</h2>
-        <GoalDropdown value={goal} onChange={update} />
-        <h3 className="mypage-section__label">기간</h3>
-        <DateRangeField
-          startDate={goal.startDate}
-          endDate={goal.endDate}
-          onStartChange={(startDate) => update({ startDate })}
-          onEndChange={(endDate) => update({ endDate })}
-          locked={autoPeriod}
-        />
-        <p className="mypage-hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
+        <div className="mypage-section__head">
+          <h2 className="mypage-section__title">목표</h2>
+          <button
+            type="button"
+            className="mypage-section__action"
+            aria-expanded={editingGoal}
+            onClick={() => setEditingGoal((open) => !open)}
+          >
+            {editingGoal ? '완료' : '변경'}
+          </button>
+        </div>
 
-        {title && (
+        {/* the goal type / value / period inputs only open from 변경 */}
+        {editingGoal && (
+          <>
+            <GoalDropdown value={goal} onChange={update} />
+            <h3 className="mypage-section__label">기간</h3>
+            <DateRangeField
+              startDate={goal.startDate}
+              endDate={goal.endDate}
+              onStartChange={(startDate) => update({ startDate })}
+              onEndChange={(endDate) => update({ endDate })}
+              locked={autoPeriod}
+            />
+            <p className="mypage-hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
+          </>
+        )}
+
+        {!editingGoal && !title && (
+          <div className="mypage-card">
+            <p className="mypage-card__meta">아직 목표를 정하지 않았어요. 변경을 눌러 목표를 정해 주세요.</p>
+          </div>
+        )}
+
+        {!editingGoal && title && (
           <div className="mypage-card">
             <div className="mypage-card__row">
               <p className="mypage-card__title">{title}</p>
               <span className="mypage-card__meta">D-{daysLeft(goal.endDate)}</span>
             </div>
+            <p className="mypage-card__meta">
+              {formatDate(goal.startDate)} ~ {formatDate(goal.endDate)}
+            </p>
             {progress ? (
               <>
                 <ProgressBar percent={progress.percent} />

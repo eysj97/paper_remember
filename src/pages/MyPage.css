@@ -188,6 +188,34 @@
   color: #4c4c4c;
 }
 
+/* section title on the left, a small action (변경 / 완료) on the right */
+.mypage-section__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mypage-section__action {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 30px;
+  padding: 0 14px;
+  border: 1px solid #939393;
+  border-radius: 50px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  color: #000;
+  cursor: pointer;
+}
+
+.mypage-section__action[aria-expanded='true'] {
+  border-color: #4c4c4c;
+  background: #4c4c4c;
+  color: #fff;
+}
+
 .mypage-section__label {
   margin-top: 6px;
   font-weight: 700;
