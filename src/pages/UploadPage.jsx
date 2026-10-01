@@ -8,6 +8,7 @@ import pencilIcon from '../assets/upload/pencil.svg'
 import moreIcon from '../assets/upload/icon-more.svg'
 import { readWordsFromImage } from '../services/ocr.js'
 import { readWordFile } from '../services/wordFile.js'
+import { findMeanings } from '../services/translate.js'
 import './UploadPage.css'
 
 // example words shown as placeholders in the manual-entry rows (Figma 84:313)
@@ -121,6 +122,30 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
     )
   }
 
+  // words that came without a meaning get one looked up right away, so the rows show it before
+  // registering; anything typed in meanwhile is left alone
+  const fillMeanings = async (words) => {
+    const missing = words.filter((w) => !w.meaning.trim()).map((w) => w.word)
+    if (missing.length === 0) return
+    const progress = (done) => setNotice({ text: `뜻을 찾는 중이에요... (${done}/${missing.length})`, persistent: true })
+    progress(0)
+    const found = await findMeanings(missing, {
+      onFound: (word, meaning) =>
+        setRows((prev) =>
+          prev.map((r) =>
+            r.word.trim().toLowerCase() === word.toLowerCase() && !r.meaning.trim() ? { ...r, meaning } : r,
+          ),
+        ),
+      onProgress: progress,
+    })
+    setNotice({
+      text:
+        found === missing.length
+          ? `단어 ${words.length}개의 뜻을 채웠어요. 틀린 뜻은 고쳐 주세요.`
+          : `뜻 ${found}개를 채웠어요. 빈 칸은 단어등록할 때 사전 뜻으로 채워져요.`,
+    })
+  }
+
   const handleImage = async (image) => {
     setBusy(true)
     setNotice({ text: '사진에서 글자를 읽는 중이에요...', persistent: true })
@@ -129,8 +154,9 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
       if (words.length === 0) {
         setNotice({ text: '단어를 찾지 못했어요. 더 밝고 또렷하게 다시 찍어 주세요.' })
       } else {
-        applyWords(words.map((word) => ({ word, meaning: '' })))
-        setNotice({ text: `단어 ${words.length}개를 찾았어요. 필요 없는 단어는 - 로 지워 주세요.` })
+        const found = words.map((word) => ({ word, meaning: '' }))
+        applyWords(found)
+        await fillMeanings(found)
       }
     } catch {
       setNotice({ text: '글자를 읽지 못했어요. 잠시 후 다시 시도해 주세요.' })
@@ -151,10 +177,17 @@ export default function UploadPage({ studyMode, firstUpload = false, onNavigate,
         setNotice({ text: "파일에서 '영단어,뜻' 형식의 줄을 찾지 못했어요." })
       } else {
         applyWords(words)
-        setNotice({ text: `단어 ${words.length}개를 불러왔어요.` })
+        if (words.every((w) => w.meaning.trim())) {
+          setNotice({ text: `단어 ${words.length}개를 불러왔어요.` })
+        } else {
+          setBusy(true)
+          await fillMeanings(words)
+        }
       }
     } catch {
       setNotice({ text: '파일을 읽지 못했어요.' })
+    } finally {
+      setBusy(false)
     }
     return undefined
   }

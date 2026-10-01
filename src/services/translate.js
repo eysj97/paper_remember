@@ -18,3 +18,28 @@ export async function translateToKorean(text, signal) {
     return ''
   }
 }
+
+const HANGUL = /[가-힣]/
+const MEANING_CONCURRENCY = 4
+
+// Korean meanings for words read from a file or photo, so they show up before registering.
+// onFound(word, meaning) fires as each one arrives; a reply without Korean in it counts as not found.
+export async function findMeanings(words, { onFound, onProgress, signal } = {}) {
+  let next = 0
+  let done = 0
+  let found = 0
+  const worker = async () => {
+    while (next < words.length) {
+      const word = words[next++]
+      const meaning = (await translateToKorean(word, signal)).trim()
+      done += 1
+      if (HANGUL.test(meaning) && meaning.toLowerCase() !== word.toLowerCase()) {
+        found += 1
+        onFound?.(word, meaning)
+      }
+      onProgress?.(done)
+    }
+  }
+  await Promise.all(Array.from({ length: Math.min(MEANING_CONCURRENCY, words.length) }, worker))
+  return found
+}
