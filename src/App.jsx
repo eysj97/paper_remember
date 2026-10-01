@@ -285,7 +285,15 @@ export default function App() {
       onBack={goBack}
       onNext={goNext}
       canNext={canNext}
-      onLogin={serverEnabled && !auth.user ? () => setLoginFirst(true) : undefined}
+      onLogin={
+        serverEnabled && !auth.user
+          ? () => {
+              // an earlier "로그인 없이 시작하기" would otherwise keep the login screen from showing
+              chooseGuest(false)
+              setLoginFirst(true)
+            }
+          : undefined
+      }
       studyMode={studyMode}
       onStudyModeChange={setStudyMode}
       goal={profile.goal}
