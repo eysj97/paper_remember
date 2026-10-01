@@ -149,7 +149,6 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
       <section className="mypage-section">
         <h2 className="mypage-section__title">세부목표</h2>
         <div className="mypage-card">
-          <p className="mypage-card__meta">오늘 할 분량은 앱이 정해 드려요.</p>
           <div className="mypage-daily">
             {!reviewOnly && (
               <div className="mypage-daily__item">
@@ -163,11 +162,7 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
             </div>
           </div>
         </div>
-        <p className="mypage-hint">
-          {reviewOnly
-            ? '* 직접 입력한 목표는 복습 분량만 제시해요.'
-            : '* 목표를 남은 기간으로 나눈 새 단어와, 복습할 때가 된 단어예요.'}
-        </p>
+        <p className="mypage-hint">* 오늘 할 분량은 앱이 정해 드려요.</p>
       </section>
     </>
   )
