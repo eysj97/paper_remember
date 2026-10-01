@@ -27,6 +27,12 @@
   color: #637381;
 }
 
+.date-range__select:disabled {
+  background: #f4f4f4;
+  color: #000;
+  cursor: default;
+}
+
 .date-range__arrow {
   width: 12px;
   height: 6px;

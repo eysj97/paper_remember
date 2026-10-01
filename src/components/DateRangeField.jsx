@@ -6,8 +6,9 @@ import './DateRangeField.css'
 const pad2 = (n) => String(n).padStart(2, '0')
 const formatDate = ({ year, month, day }) => `${String(year).slice(2)}/${pad2(month)}/${pad2(day)}`
 
-// start ~ end date buttons; tapping one opens the wheel picker underneath
-export default function DateRangeField({ startDate, endDate, onStartChange, onEndChange }) {
+// start ~ end date buttons; tapping one opens the wheel picker underneath.
+// locked: the dates are worked out by the app (연속 학습), so they're shown but can't be picked
+export default function DateRangeField({ startDate, endDate, onStartChange, onEndChange, locked = false }) {
   const [openPicker, setOpenPicker] = useState(null) // null | 'start' | 'end'
 
   const dateButton = (id, date) => (
@@ -16,13 +17,16 @@ export default function DateRangeField({ startDate, endDate, onStartChange, onEn
       className="date-range__select"
       onClick={() => setOpenPicker((p) => (p === id ? null : id))}
       aria-expanded={openPicker === id}
+      disabled={locked}
     >
       <span>{formatDate(date)}</span>
-      <img
-        className={openPicker === id ? 'date-range__arrow date-range__arrow--open' : 'date-range__arrow'}
-        src={arrowDownIcon}
-        alt=""
-      />
+      {!locked && (
+        <img
+          className={openPicker === id ? 'date-range__arrow date-range__arrow--open' : 'date-range__arrow'}
+          src={arrowDownIcon}
+          alt=""
+        />
+      )}
     </button>
   )
 
@@ -34,10 +38,10 @@ export default function DateRangeField({ startDate, endDate, onStartChange, onEn
         {dateButton('end', endDate)}
       </div>
 
-      {openPicker === 'start' && (
+      {!locked && openPicker === 'start' && (
         <DateWheelPicker value={startDate} onChange={onStartChange} onConfirm={() => setOpenPicker(null)} />
       )}
-      {openPicker === 'end' && (
+      {!locked && openPicker === 'end' && (
         <DateWheelPicker value={endDate} onChange={onEndChange} onConfirm={() => setOpenPicker(null)} />
       )}
     </>

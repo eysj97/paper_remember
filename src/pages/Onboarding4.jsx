@@ -1,12 +1,13 @@
 import OnboardingHeader from '../components/OnboardingHeader.jsx'
 import GoalDropdown from '../components/GoalDropdown.jsx'
 import DateRangeField from '../components/DateRangeField.jsx'
-import { dateToTime } from '../services/goal.js'
+import { autoPeriodDays, changeGoal, dateToTime, isAutoPeriod } from '../services/goal.js'
 import './Onboarding4.css'
 
 // the goal lives in App (profile.goal) so mypage can show and change it later
 export default function Onboarding4({ onBack, onNext, canNext = true, goal, onGoalChange }) {
-  const update = (patch) => onGoalChange?.({ ...goal, ...patch })
+  const update = (patch) => onGoalChange?.(changeGoal(goal, patch))
+  const autoPeriod = isAutoPeriod(goal) && autoPeriodDays(goal) > 0
   const datesReversed = dateToTime(goal.endDate) < dateToTime(goal.startDate)
 
   return (
@@ -45,7 +46,11 @@ export default function Onboarding4({ onBack, onNext, canNext = true, goal, onGo
               endDate={goal.endDate}
               onStartChange={(startDate) => update({ startDate })}
               onEndChange={(endDate) => update({ endDate })}
+              locked={autoPeriod}
             />
+            {autoPeriod && (
+              <p className="onboarding4__hint">* 연속 학습은 오늘부터 {autoPeriodDays(goal)}일로 기간이 자동으로 정해져요.</p>
+            )}
           </div>
           <p className="onboarding4__hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
           {datesReversed && (

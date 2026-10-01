@@ -26,6 +26,24 @@ export function goalTitle(goal) {
   return type.id === 'custom' ? value : `${value}${type.suffix}`
 }
 
+// 연속 학습 N일: the period is worked out, today through the N-th day (today counts as day 1)
+export const isAutoPeriod = (goal) => goal?.type === 'streak'
+export const autoPeriodDays = (goal) => Math.floor(Number(goal?.value))
+
+export function withAutoPeriod(goal, now = Date.now()) {
+  const days = autoPeriodDays(goal)
+  if (!isAutoPeriod(goal) || !(days > 0)) return goal
+  const end = new Date(now)
+  end.setDate(end.getDate() + days - 1)
+  return { ...goal, startDate: timeToDate(now), endDate: timeToDate(end.getTime()) }
+}
+
+// applies a change to the goal; picking 연속 학습 or changing its days restarts the period from today
+export function changeGoal(goal, patch, now = Date.now()) {
+  const next = { ...goal, ...patch }
+  return 'type' in patch || 'value' in patch ? withAutoPeriod(next, now) : next
+}
+
 const startOfDay = (time) => {
   const d = new Date(time)
   d.setHours(0, 0, 0, 0)

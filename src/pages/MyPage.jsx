@@ -8,7 +8,16 @@ import ModeBadge from '../components/ModeBadge.jsx'
 import GoalDropdown from '../components/GoalDropdown.jsx'
 import DateRangeField from '../components/DateRangeField.jsx'
 import { buildDailyPlan, isEligible } from '../services/study.js'
-import { dailyNewFor, daysLeft, goalProgress, goalTitle, isTrackable } from '../services/goal.js'
+import {
+  autoPeriodDays,
+  changeGoal,
+  dailyNewFor,
+  daysLeft,
+  goalProgress,
+  goalTitle,
+  isAutoPeriod,
+  isTrackable,
+} from '../services/goal.js'
 import { recentDays, streakDays, totals } from '../services/studyLog.js'
 import { readAvatar } from '../services/profile.js'
 import { downloadBackup, restoreBackup } from '../services/backup.js'
@@ -50,7 +59,8 @@ function ProgressBar({ percent }) {
 // ---------- 학습목표 설정: 목적 -> 목표 -> 세부목표 ----------
 function GoalSection({ words, profile, studyLog, onProfileChange }) {
   const { goal, studyMode } = profile
-  const update = (patch) => onProfileChange({ goal: { ...goal, ...patch } })
+  const update = (patch) => onProfileChange({ goal: changeGoal(goal, patch) })
+  const autoPeriod = isAutoPeriod(goal) && autoPeriodDays(goal) > 0
 
   const title = goalTitle(goal)
   const progress = goalProgress(goal, { words, streak: streakDays(studyLog), accuracy: totals(studyLog).accuracy })
@@ -80,7 +90,11 @@ function GoalSection({ words, profile, studyLog, onProfileChange }) {
           endDate={goal.endDate}
           onStartChange={(startDate) => update({ startDate })}
           onEndChange={(endDate) => update({ endDate })}
+          locked={autoPeriod}
         />
+        {autoPeriod && (
+          <p className="mypage-hint">* 연속 학습은 오늘부터 {autoPeriodDays(goal)}일로 기간이 자동으로 정해져요.</p>
+        )}
         <p className="mypage-hint">* 언제까지 얼마나 외울지, 눈에 보이는 결과를 정해요.</p>
 
         {title && (
