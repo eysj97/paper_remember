@@ -285,6 +285,152 @@
   cursor: default;
 }
 
+/* 예문 순서 맞추기: whole sentences, one per row */
+.study-arrange--stack .study-arrange__built,
+.study-arrange--stack .study-arrange__pool {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.study-arrange--stack .study-token {
+  height: auto;
+  min-height: 40px;
+  padding: 8px 16px;
+  border-radius: 12px;
+  line-height: 1.4;
+  text-align: left;
+}
+
+/* 철자 빈칸 채우기: "a_p_e" with the letters spread out */
+.study-pattern {
+  font-weight: 700;
+  font-size: 32px;
+  line-height: normal;
+  letter-spacing: 10px;
+}
+
+/* ---------- 짝 맞추기 ---------- */
+.study-match {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.study-match__column {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.study-match__item {
+  appearance: none;
+  -webkit-appearance: none;
+  position: relative;
+  min-height: 56px;
+  padding: 10px 14px 10px 36px;
+  border: 1px solid #939393;
+  border-radius: 12px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.35;
+  text-align: left;
+  color: #000;
+  cursor: pointer;
+}
+
+.study-match__item:disabled {
+  cursor: default;
+}
+
+.study-match__item--picked {
+  border-color: #4c4c4c;
+  box-shadow: inset 0 0 0 1px #4c4c4c;
+}
+
+.study-match__item--paired {
+  background: #f4f4f4;
+}
+
+.study-match__item--right {
+  border-color: #4c4c4c;
+  background: #4c4c4c;
+  color: #fff;
+}
+
+.study-match__item--wrong {
+  border-color: #c62828;
+  color: #c62828;
+}
+
+.study-match__badge {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #4c4c4c;
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  color: #fff;
+}
+
+.study-match__item--right .study-match__badge {
+  background: #fff;
+  color: #4c4c4c;
+}
+
+/* ---------- 대화 빈칸 채우기 ---------- */
+.study-dialogue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.study-dialogue__turn {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.study-dialogue__turn--reply {
+  flex-direction: row-reverse;
+}
+
+.study-dialogue__speaker {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #4c4c4c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.study-dialogue__bubble {
+  max-width: 290px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: #f4f4f4;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.study-dialogue__turn--reply .study-dialogue__bubble {
+  background: #d9d9d9 url('../../imges/craft-page-sm.png') center / cover;
+}
+
+.study-dialogue .study-prompt__hint {
+  text-align: center;
+}
+
 /* ---------- feedback ---------- */
 .study-feedback {
   display: flex;

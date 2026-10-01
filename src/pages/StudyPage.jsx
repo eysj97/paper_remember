@@ -3,7 +3,9 @@ import ModeBadge from '../components/ModeBadge.jsx'
 import { Example, SpeakButton } from '../components/WordText.jsx'
 import {
   BLANK,
+  CHIP_TYPES,
   QUESTION_LABELS,
+  TYPED_TYPES,
   answerText,
   correctAnswerText,
   gradeAnswer,
@@ -21,6 +23,8 @@ const EMPTY_MESSAGES = {
 
 const TITLES = { new: '새로운 단어 암기', review: '복습하기', wrong: '오답노트' }
 
+const TYPED_PLACEHOLDERS = { meaning: '뜻 입력', contextMeaning: '뜻 입력', makeSentence: '영어 문장 입력' }
+
 // the sentence with the studied word underlined (contextMeaning)
 function UnderlinedSentence({ sentence, word }) {
   const parts = sentence.split(new RegExp(`(${wordPattern(word).source})`, 'i'))
@@ -31,75 +35,185 @@ function UnderlinedSentence({ sentence, word }) {
   )
 }
 
-// the sentence with the word blanked out (cloze)
-function BlankedSentence({ sentence }) {
-  const parts = sentence.split(BLANK)
+// a sentence with the word blanked out (cloze, clozeTyped, dialogue)
+function BlankedText({ text }) {
+  const parts = text.split(BLANK)
+  return parts.map((part, i) => (
+    <span key={i}>
+      {part}
+      {i < parts.length - 1 && <span className="study-blank" />}
+    </span>
+  ))
+}
+
+// the meaning prompt shared by spelling / wordChoice / letterBlank / anagram
+function MeaningPrompt({ item, hint, children }) {
   return (
-    <p className="study-sentence">
-      {parts.map((part, i) => (
-        <span key={i}>
-          {part}
-          {i < parts.length - 1 && <span className="study-blank" />}
-        </span>
-      ))}
-    </p>
+    <div className="study-prompt">
+      <p className="study-prompt__meaning">{item.meaning}</p>
+      {children}
+      <p className="study-prompt__hint">{hint}</p>
+    </div>
+  )
+}
+
+// the word prompt shared by meaning / meaningChoice / synonym / makeSentence
+function WordPrompt({ item, hint, showMeaning = false }) {
+  return (
+    <div className="study-prompt">
+      <p className="study-prompt__word">{item.word}</p>
+      <div className="study-prompt__pron">
+        {item.phonetic && <span>{item.phonetic}</span>}
+        <SpeakButton word={item.word} />
+      </div>
+      {showMeaning && item.meaning && <p className="study-prompt__hint">{item.meaning}</p>}
+      <p className="study-prompt__hint">{hint}</p>
+    </div>
   )
 }
 
 function Prompt({ question }) {
   const { type, item } = question
+  const letterCount = item.word.replace(/\s/g, '').length
 
-  if (type === 'meaning') {
-    return (
-      <div className="study-prompt">
-        <p className="study-prompt__word">{item.word}</p>
-        <div className="study-prompt__pron">
-          {item.phonetic && <span>{item.phonetic}</span>}
-          <SpeakButton word={item.word} />
+  switch (type) {
+    case 'meaning':
+      return <WordPrompt item={item} hint="이 단어의 뜻을 입력해 주세요" />
+    case 'meaningChoice':
+      return <WordPrompt item={item} hint="알맞은 뜻을 골라 주세요" />
+    case 'synonym':
+      return <WordPrompt item={item} hint="뜻이 비슷한 단어를 골라 주세요" />
+    case 'makeSentence':
+      return <WordPrompt item={item} showMeaning hint="이 단어를 넣어 영어 문장을 만들어 주세요 (3단어 이상)" />
+    case 'spelling':
+      return <MeaningPrompt item={item} hint={`뜻에 맞는 영단어를 입력해 주세요 (글자 수 ${letterCount})`} />
+    case 'wordChoice':
+      return <MeaningPrompt item={item} hint="뜻에 맞는 영단어를 골라 주세요" />
+    case 'letterBlank':
+      return (
+        <MeaningPrompt item={item} hint="빈칸을 채워 영단어를 입력해 주세요">
+          <p className="study-pattern">{question.pattern}</p>
+        </MeaningPrompt>
+      )
+    case 'anagram':
+      return <MeaningPrompt item={item} hint="철자를 순서대로 눌러 영단어를 완성해 주세요" />
+    case 'matching':
+      return (
+        <div className="study-prompt">
+          <p className="study-prompt__hint">영단어와 뜻을 차례로 눌러 짝을 맞춰 주세요</p>
         </div>
-        <p className="study-prompt__hint">이 단어의 뜻을 입력해 주세요</p>
-      </div>
-    )
+      )
+    case 'cloze':
+    case 'clozeTyped':
+      return (
+        <div className="study-prompt">
+          <p className="study-sentence">
+            <BlankedText text={question.sentence} />
+          </p>
+          {item.exampleKo && <p className="study-prompt__hint">{item.exampleKo}</p>}
+          {type === 'clozeTyped' && (
+            <p className="study-prompt__hint">빈칸에 들어갈 영단어를 입력해 주세요 (글자 수 {letterCount})</p>
+          )}
+        </div>
+      )
+    case 'contextMeaning':
+      return (
+        <div className="study-prompt">
+          <UnderlinedSentence sentence={question.sentence} word={item.word} />
+          <p className="study-prompt__hint">밑줄 친 단어의 뜻은?</p>
+        </div>
+      )
+    case 'translation':
+      return (
+        <div className="study-prompt">
+          <p className="study-sentence">{item.example}</p>
+          <p className="study-prompt__hint">알맞은 해석을 골라 주세요</p>
+        </div>
+      )
+    case 'sentenceOrder':
+      return (
+        <div className="study-prompt">
+          <p className="study-prompt__hint">문장을 순서대로 눌러 예문을 완성해 주세요</p>
+        </div>
+      )
+    case 'dialogue':
+      return (
+        <div className="study-dialogue">
+          {question.turns.map((turn, i) => (
+            <div key={i} className={`study-dialogue__turn${i % 2 === 1 ? ' study-dialogue__turn--reply' : ''}`}>
+              <span className="study-dialogue__speaker">{turn.speaker}</span>
+              <p className="study-dialogue__bubble">
+                <BlankedText text={turn.text} />
+              </p>
+            </div>
+          ))}
+          <p className="study-prompt__hint">빈칸에 알맞은 말을 골라 주세요</p>
+        </div>
+      )
+    default:
+      // arrange
+      return (
+        <div className="study-prompt">
+          <p className="study-prompt__meaning">{item.exampleKo}</p>
+          <p className="study-prompt__hint">단어를 순서대로 눌러 영어 문장을 완성해 주세요</p>
+        </div>
+      )
   }
+}
 
-  if (type === 'spelling') {
-    return (
-      <div className="study-prompt">
-        <p className="study-prompt__meaning">{item.meaning}</p>
-        <p className="study-prompt__hint">뜻에 맞는 영단어를 입력해 주세요 (글자 수 {item.word.replace(/\s/g, '').length})</p>
-      </div>
-    )
-  }
-
-  if (type === 'cloze') {
-    return (
-      <div className="study-prompt">
-        <BlankedSentence sentence={question.sentence} />
-        {item.exampleKo && <p className="study-prompt__hint">{item.exampleKo}</p>}
-      </div>
-    )
-  }
-
-  if (type === 'contextMeaning') {
-    return (
-      <div className="study-prompt">
-        <UnderlinedSentence sentence={question.sentence} word={item.word} />
-        <p className="study-prompt__hint">밑줄 친 단어의 뜻은?</p>
-      </div>
-    )
+// 짝 맞추기: tap a word, then its meaning. Tapping a paired word (or meaning) undoes that pair.
+function Matching({ question, pairs, picked, onPick, onPair, onUnpair, done }) {
+  const pairNumber = (word) => question.words.indexOf(word) + 1
+  const wordOfMeaning = (meaning) => Object.keys(pairs).find((w) => pairs[w] === meaning)
+  const stateOf = (word) => {
+    if (!done || !pairs[word]) return ''
+    return question.pairs.find((p) => p.word === word).meaning === pairs[word] ? ' study-match__item--right' : ' study-match__item--wrong'
   }
 
   return (
-    <div className="study-prompt">
-      <p className="study-prompt__meaning">{item.exampleKo}</p>
-      <p className="study-prompt__hint">단어를 순서대로 눌러 영어 문장을 완성해 주세요</p>
+    <div className="study-match">
+      <div className="study-match__column">
+        {question.words.map((word) => (
+          <button
+            key={word}
+            type="button"
+            disabled={done}
+            className={`study-match__item${picked === word ? ' study-match__item--picked' : ''}${pairs[word] ? ' study-match__item--paired' : ''}${stateOf(word)}`}
+            onClick={() => (pairs[word] ? onUnpair(word) : onPick(picked === word ? null : word))}
+          >
+            {pairs[word] && <span className="study-match__badge">{pairNumber(word)}</span>}
+            {word}
+          </button>
+        ))}
+      </div>
+      <div className="study-match__column">
+        {question.meanings.map((meaning) => {
+          const owner = wordOfMeaning(meaning)
+          return (
+            <button
+              key={meaning}
+              type="button"
+              disabled={done}
+              className={`study-match__item${owner ? ' study-match__item--paired' : ''}${owner ? stateOf(owner) : ''}`}
+              onClick={() => {
+                if (picked) onPair(picked, meaning)
+                else if (owner) onUnpair(owner)
+              }}
+            >
+              {owner && <span className="study-match__badge">{pairNumber(owner)}</span>}
+              {meaning}
+            </button>
+          )
+        })}
+      </div>
     </div>
   )
 }
 
 function Feedback({ question, correct, answer }) {
-  const { item } = question
-  const given = answer === null || answer === '' ? '(모르겠어요)' : answerText(question, answer)
+  const { item, type } = question
+  const empty = answer === null || answer === '' || (type === 'matching' && Object.keys(answer ?? {}).length === 0)
+  const given = empty ? '(모르겠어요)' : answerText(question, answer)
 
   return (
     <div className="study-feedback">
@@ -112,7 +226,7 @@ function Feedback({ question, correct, answer }) {
         </p>
       )}
       <p className="study-feedback__row">
-        <span>정답</span> {correctAnswerText(question)}
+        <span>{type === 'makeSentence' ? '예시' : '정답'}</span> {correctAnswerText(question)}
       </p>
 
       <div className="study-card">
@@ -192,11 +306,22 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
   const [results, setResults] = useState([])
   const [typed, setTyped] = useState('')
   const [placed, setPlaced] = useState([])
+  // matching: { word: meaning } so far, and the word waiting for its meaning
+  const [pairs, setPairs] = useState({})
+  const [pickedWord, setPickedWord] = useState(null)
 
   const question = questions[index]
   const total = questions.length
   const answered = phase === 'feedback' ? index + 1 : index
   const percent = total ? Math.round((phase === 'done' ? total : answered) / total * 100) : 0
+
+  const clearAnswer = () => {
+    setAnswer(null)
+    setTyped('')
+    setPlaced([])
+    setPairs({})
+    setPickedWord(null)
+  }
 
   const finish = (given, ok) => {
     setAnswer(given)
@@ -207,7 +332,7 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
   }
 
   const submit = (given) => finish(given, gradeAnswer(question, given))
-  const skip = () => finish(null, false)
+  const skip = () => finish(question.type === 'matching' ? {} : null, false)
 
   const next = () => {
     if (index + 1 >= total) {
@@ -216,9 +341,7 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
     }
     setIndex(index + 1)
     setPhase('answer')
-    setAnswer(null)
-    setTyped('')
-    setPlaced([])
+    clearAnswer()
   }
 
   const retry = (items) => {
@@ -227,10 +350,8 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
     setRecord(false)
     setIndex(0)
     setPhase('answer')
-    setAnswer(null)
     setResults([])
-    setTyped('')
-    setPlaced([])
+    clearAnswer()
   }
 
   const header = (
@@ -282,22 +403,37 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
   }
 
   const inFeedback = phase === 'feedback'
-  const typedType = question.type === 'meaning' || question.type === 'spelling' || (!question.choices && question.type !== 'arrange')
+  const { type } = question
+  const typedType = TYPED_TYPES.has(type) || (type === 'contextMeaning' && !question.choices)
+  const chipType = CHIP_TYPES.has(type)
   const chipById = (id) => question.chips?.find((chip) => chip.id === id)
   const pool = question.chips?.filter((chip) => !placed.includes(chip.id)) ?? []
+  const allPaired = type === 'matching' && Object.keys(pairs).length === question.pairs.length
+
+  const pair = (word, meaning) => {
+    setPairs((prev) => {
+      const nextPairs = Object.fromEntries(Object.entries(prev).filter(([, m]) => m !== meaning))
+      return { ...nextPairs, [word]: meaning }
+    })
+    setPickedWord(null)
+  }
+  const unpair = (word) => {
+    setPairs((prev) => Object.fromEntries(Object.entries(prev).filter(([w]) => w !== word)))
+    setPickedWord(word)
+  }
 
   return (
     <div className="page study-page" data-name="학습">
       {header}
 
       <div className="study-body">
-        <span className="study-type">{QUESTION_LABELS[question.type]}</span>
+        <span className="study-type">{QUESTION_LABELS[type]}</span>
         <Prompt question={question} />
 
         {question.choices && (
           <div className="study-choices">
             {question.choices.map((choice) => {
-              const isRight = choice === correctAnswerText(question)
+              const isRight = choice === question.answer
               const isPicked = choice === answer
               let state = ''
               if (inFeedback && isRight) state = ' study-choice--right'
@@ -332,15 +468,15 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
-              placeholder={question.type === 'spelling' || question.type === 'cloze' ? '영단어 입력' : '뜻 입력'}
+              placeholder={TYPED_PLACEHOLDERS[type] ?? '영단어 입력'}
               aria-label="정답 입력"
               onChange={(e) => setTyped(e.target.value)}
             />
           </form>
         )}
 
-        {question.type === 'arrange' && (
-          <div className="study-arrange">
+        {chipType && (
+          <div className={`study-arrange${type === 'sentenceOrder' ? ' study-arrange--stack' : ''}`}>
             <div className="study-arrange__built">
               {(inFeedback ? answer ?? [] : placed).map((id) => (
                 <button
@@ -353,7 +489,11 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
                   {chipById(id).text}
                 </button>
               ))}
-              {!inFeedback && placed.length === 0 && <span className="study-arrange__empty">여기에 문장이 만들어져요</span>}
+              {!inFeedback && placed.length === 0 && (
+                <span className="study-arrange__empty">
+                  {type === 'anagram' ? '여기에 단어가 만들어져요' : '여기에 문장이 만들어져요'}
+                </span>
+              )}
             </div>
             {!inFeedback && (
               <div className="study-arrange__pool">
@@ -367,6 +507,18 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
           </div>
         )}
 
+        {type === 'matching' && (
+          <Matching
+            question={question}
+            pairs={inFeedback ? answer ?? {} : pairs}
+            picked={pickedWord}
+            onPick={setPickedWord}
+            onPair={pair}
+            onUnpair={unpair}
+            done={inFeedback}
+          />
+        )}
+
         {inFeedback && <Feedback question={question} correct={correct} answer={answer} />}
       </div>
 
@@ -377,12 +529,12 @@ export default function StudyPage({ kind, words, studyMode, onAnswer, onExit }) 
           </button>
         ) : (
           <>
-            {(typedType || question.type === 'arrange') && (
+            {(typedType || chipType || type === 'matching') && (
               <button
                 type="button"
                 className="study-button"
-                disabled={typedType ? !typed.trim() : placed.length === 0}
-                onClick={() => submit(typedType ? typed : placed)}
+                disabled={typedType ? !typed.trim() : chipType ? placed.length === 0 : !allPaired}
+                onClick={() => submit(typedType ? typed : chipType ? placed : pairs)}
               >
                 확인
               </button>

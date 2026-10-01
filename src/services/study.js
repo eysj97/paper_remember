@@ -1,7 +1,7 @@
 // Study rules: what to review when (forgetting curve), what today's plan contains, and in which
 // order each study button hands out questions. Pure functions over the saved word list, so the
 // quiz screens, home and library all read from the same rules.
-import { containsWord } from './text.js'
+import { containsWord, dialogueTurns, splitSentences } from './text.js'
 
 // A word carries (see the Word data model in the spec):
 //   learned, learnedAt, reviewStage, reviewDueAt, lastReviewedAt, reviewCount, wrongCount, lastWrongAt
@@ -42,22 +42,42 @@ const isSameDay = (a, b) => startOfDay(a) === startOfDay(b)
 
 const MAX_ARRANGE_WORDS = 8
 
+// a single plain word, short enough to spell out letter by letter
+const SPELLABLE = /^[a-z]{3,14}$/i
+
 // which question types a word can be asked with in the chosen mode (no mode chosen yet = exam).
-//   exam         : meaning / spelling, both need the Korean meaning to ask or grade with
-//   conversation : built from the example sentence. cloze and contextMeaning need the word to
-//                  appear in the sentence as-is; arrange needs a short sentence with its Korean line
+// Types that also need other saved words (wrong choices, matching pairs) are listed here and
+// dropped later by the quiz when there aren't enough of them.
+//   exam         : everything built on the Korean meaning; letterBlank / anagram need a single
+//                  plain word; synonym needs the word's synonyms
+//   conversation : built from the example sentence. cloze / clozeTyped / contextMeaning need the word
+//                  in the sentence as-is; arrange needs a short sentence with its Korean line;
+//                  sentenceOrder and dialogue need an example of two or more sentences
 export function questionTypesFor(word, mode) {
-  if (mode !== 'conversation') return word.meaning ? ['meaning', 'spelling'] : []
+  if (mode !== 'conversation') {
+    const types = []
+    if (word.meaning) {
+      types.push('meaning', 'spelling', 'meaningChoice', 'wordChoice', 'matching')
+      if (SPELLABLE.test(word.word)) types.push('letterBlank', 'anagram')
+    }
+    if (word.synonyms?.length > 0) types.push('synonym')
+    return types
+  }
 
   const example = word.example?.trim()
   if (!example) return []
 
-  const types = []
+  const types = ['makeSentence']
   if (containsWord(example, word.word)) {
-    types.push('cloze')
+    types.push('cloze', 'clozeTyped')
     if (word.meaning) types.push('contextMeaning')
   }
-  if (word.exampleKo && example.split(/\s+/).length <= MAX_ARRANGE_WORDS) types.push('arrange')
+  if (word.exampleKo) {
+    types.push('translation')
+    if (example.split(/\s+/).length <= MAX_ARRANGE_WORDS) types.push('arrange')
+  }
+  if (splitSentences(example).length >= 2) types.push('sentenceOrder')
+  if (dialogueTurns(example)?.some((turn) => containsWord(turn.text, word.word))) types.push('dialogue')
   return types
 }
 
